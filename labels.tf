@@ -7,7 +7,7 @@ resource "random_string" "asg-suffix" {
 }
 
 locals {
-  name = var.name == null ? join("-", ["eks", random_string.asg-suffix.result]) : var.name
+  name = var.name == null ? join("-", ["asg", random_string.asg-suffix.result]) : var.name
   default-tags = merge(
     { "terraform.io" = "managed" },
   )
