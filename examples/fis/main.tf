@@ -38,4 +38,5 @@ module "fis" {
   azs    = var.azs
   vpc    = module.vpc.vpc.id
   asg    = module.ec2.asg.default.name
+  role   = module.ec2.role.arn
 }

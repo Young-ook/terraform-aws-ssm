@@ -23,6 +23,11 @@ variable "asg" {
   type        = string
 }
 
+variable "role" {
+  description = "Role ARN of autoscaling group of fault injection target"
+  type        = string
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"
