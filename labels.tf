@@ -1,4 +1,4 @@
-resource "random_string" "asg-suffix" {
+resource "random_string" "ec2-suffix" {
   length  = 12
   upper   = false
   lower   = true
@@ -7,7 +7,7 @@ resource "random_string" "asg-suffix" {
 }
 
 locals {
-  name = var.name == null ? join("-", ["asg", random_string.asg-suffix.result]) : var.name
+  name = var.name == null ? join("-", ["ec2", random_string.ec2-suffix.result]) : var.name
   default-tags = merge(
     { "terraform.io" = "managed" },
   )
