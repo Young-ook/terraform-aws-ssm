@@ -3,6 +3,7 @@
 
 ## Examples
 - [Bastion host using AWS Session Manager](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/bastion)
+- [AWS Fault Injection Simulator with AWS Systems Manager](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/fis)
 
 ## Getting started
 ### AWS CLI
