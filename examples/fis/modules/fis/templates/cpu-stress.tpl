@@ -25,7 +25,7 @@
             "parameters": {
                 "duration": "PT2M",
                 "documentArn": "arn:aws:ssm:${region}::document/AWSFIS-Run-CPU-Stress",
-                "documentParameters": "{\"DurationSeconds\": \"60\", \"InstallDependencies\": \"True\", \"CPU\": \"0\"}"
+                "documentParameters": "{\"DurationSeconds\": \"120\", \"InstallDependencies\": \"True\", \"CPU\": \"0\"}"
             },
             "targets": {
                 "Instances": "myInstance"
