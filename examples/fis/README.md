@@ -19,6 +19,7 @@ Run script
 $ ./fis-create-experiments.sh
 ```
 This script creates fault injection simulator experiment templates on the AWS account. Move to the AWS FIS service page on the AWS Management Conosol and select Experiment templates menu on the left. Then users will see the created experiment templates for chaos engineering.
+![aws-fis-experiment-templates](../../images/aws-fis-experiment-templates.png)
 
 ## Run experiments
 To test your environment, select a experiment template that you want to run and click the `Actions` button on the right top on the screen. You will see `Start experiment` in the middle of poped up menu and select it. And follow the instructions.
