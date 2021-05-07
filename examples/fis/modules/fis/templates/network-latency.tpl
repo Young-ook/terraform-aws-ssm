@@ -1,8 +1,8 @@
 {
     "tags": {
-        "Name": "CPUStress"
+        "Name": "NetworkLatency"
     },
-    "description": "Run a CPU fault injection on the specified instance",
+    "description": "Run a Network latency fault injection on the specified instance",
     "targets": {
         "myInstance": {
             "resourceType": "aws:ec2:instance",
@@ -15,17 +15,17 @@
                     "values": ["running"]
                 }
             ],
-            "selectionMode": "PERCENT(50)"
+            "selectionMode": "COUNT(1)"
         }
     },
     "actions": {
-        "CPUStress": {
+        "NetworkLatency": {
             "actionId": "aws:ssm:send-command",
-            "description": "run cpu stress using ssm",
+            "description": "run network latency using ssm",
             "parameters": {
                 "duration": "PT2M",
-                "documentArn": "arn:aws:ssm:${region}::document/AWSFIS-Run-CPU-Stress",
-                "documentParameters": "{\"DurationSeconds\": \"120\", \"InstallDependencies\": \"True\", \"CPU\": \"0\"}"
+                "documentArn": "arn:aws:ssm:${region}::document/AWSFIS-Run-Network-Latency",
+                "documentParameters": "{\"DurationSeconds\": \"120\", \"InstallDependencies\": \"True\", \"DelayMilliseconds\": \"1000\"}"
             },
             "targets": {
                 "Instances": "myInstance"
