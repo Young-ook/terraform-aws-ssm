@@ -15,7 +15,7 @@
                     "values": ["running"]
                 }
             ],
-            "selectionMode": "COUNT(1)"
+            "selectionMode": "ALL"
         }
     },
     "actions": {
