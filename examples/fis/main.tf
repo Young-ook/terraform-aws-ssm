@@ -10,14 +10,15 @@ provider "aws" {
 
 # vpc
 module "vpc" {
-  source     = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
-  name       = var.name
-  tags       = var.tags
-  azs        = var.azs
-  cidr       = var.cidr
-  enable_igw = var.enable_igw
-  enable_ngw = var.enable_ngw
-  single_ngw = var.single_ngw
+  source              = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
+  name                = var.name
+  tags                = var.tags
+  azs                 = var.azs
+  cidr                = var.cidr
+  vpc_endpoint_config = var.vpc_endpoint_config
+  enable_igw          = var.enable_igw
+  enable_ngw          = var.enable_ngw
+  single_ngw          = var.single_ngw
 }
 
 # ec2
