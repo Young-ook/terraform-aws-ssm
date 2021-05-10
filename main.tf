@@ -69,9 +69,10 @@ resource "aws_launch_template" "asg" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   name          = join("-", [local.name, each.key])
   tags          = merge(local.default-tags, var.tags)
-  image_id      = data.aws_ami.al2[each.key].id
+  image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
   user_data     = base64encode(data.template_file.boot[each.key].rendered)
   instance_type = lookup(each.value, "instance_type", "t3.medium")
+  key_name      = lookup(each.value, "key_name", null)
 
   iam_instance_profile {
     arn = aws_iam_instance_profile.asg.arn
