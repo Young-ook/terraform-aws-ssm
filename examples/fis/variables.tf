@@ -19,6 +19,12 @@ variable "azs" {
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
+variable "vpc_endpoint_config" {
+  description = "A list of vpc endpoint configurations"
+  type        = list
+  default     = null
+}
+
 variable "private_subnets" {
   description = "A list of CIDRs for private subnets"
   type        = list(string)
