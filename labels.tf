@@ -1,4 +1,4 @@
-resource "random_string" "ec2-suffix" {
+resource "random_string" "uid" {
   length  = 12
   upper   = false
   lower   = true
@@ -6,8 +6,18 @@ resource "random_string" "ec2-suffix" {
   special = false
 }
 
+resource "random_string" "suffix" {
+  length  = 5
+  upper   = false
+  lower   = true
+  number  = false
+  special = false
+}
+
 locals {
-  name = var.name == null ? join("-", ["ec2", random_string.ec2-suffix.result]) : var.name
+  service = "ec2"
+  uid     = join("-", [local.service, random_string.uid.result])
+  name    = var.name == null ? local.uid : join("-", [var.name, random_string.suffix.result])
   default-tags = merge(
     { "terraform.io" = "managed" },
   )
