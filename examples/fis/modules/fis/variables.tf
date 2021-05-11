@@ -18,6 +18,7 @@ variable "vpc" {
   type        = string
 }
 
+### target
 variable "asg" {
   description = "Autoscaling group name of fault injection target"
   type        = string

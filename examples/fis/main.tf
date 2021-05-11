@@ -30,6 +30,16 @@ module "ec2" {
   node_groups = var.node_groups
 }
 
+# alb
+module "alb" {
+  source  = "./modules/alb"
+  name    = var.name
+  tags    = var.tags
+  vpc     = module.vpc.vpc.id
+  subnets = values(module.vpc.subnets["public"])
+  asg     = module.ec2.asg.default.name
+}
+
 # fis
 module "fis" {
   source = "./modules/fis"
