@@ -1,4 +1,4 @@
-resource "random_string" "alb-suffix" {
+resource "random_string" "uid" {
   length  = 12
   upper   = false
   lower   = true
@@ -7,7 +7,11 @@ resource "random_string" "alb-suffix" {
 }
 
 locals {
-  name = var.name == null ? join("-", ["alb", random_string.alb-suffix.result]) : var.name
+  service           = "alb"
+  uid               = join("-", [local.service, random_string.uid.result])
+  name              = var.name == null || var.name == "" ? local.uid : var.name
+  alb_sg_name       = join("-", [local.name, "alb"])
+  alb_aware_sg_name = join("-", [local.name, "alb-aware"])
   default-tags = merge(
     { "terraform.io" = "managed" },
   )

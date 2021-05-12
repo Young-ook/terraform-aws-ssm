@@ -23,11 +23,21 @@ module "vpc" {
 
 # ec2
 module "ec2" {
-  source      = "../../"
-  name        = var.name
-  tags        = var.tags
-  subnets     = values(module.vpc.subnets["private"])
-  node_groups = var.node_groups
+  source  = "../../"
+  name    = var.name
+  tags    = var.tags
+  subnets = values(module.vpc.subnets["private"])
+  node_groups = [
+    {
+      name            = "web"
+      min_size        = 1
+      max_size        = 3
+      desired_size    = 3
+      instance_type   = "t3.small"
+      security_groups = [module.alb.alb_aware_sg]
+      user_data       = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+    }
+  ]
 }
 
 # alb
@@ -37,7 +47,7 @@ module "alb" {
   tags    = var.tags
   vpc     = module.vpc.vpc.id
   subnets = values(module.vpc.subnets["public"])
-  asg     = module.ec2.asg.default.name
+  asg     = module.ec2.asg.web.name
 }
 
 # fis
@@ -48,6 +58,6 @@ module "fis" {
   region = var.aws_region
   azs    = var.azs
   vpc    = module.vpc.vpc.id
-  asg    = module.ec2.asg.default.name
+  asg    = module.ec2.asg.web.name
   role   = module.ec2.role.arn
 }

@@ -11,9 +11,9 @@ resource "aws_lb" "alb" {
 
 # security/firewall
 resource "aws_security_group" "alb" {
-  name        = join("-", [local.name, "alb"])
-  description = format("security group for %s", local.name)
-  tags        = merge(local.default-tags, var.tags)
+  name        = local.alb_sg_name
+  description = format("security group for %s", local.alb_sg_name)
+  tags        = merge({ "Name" = local.alb_sg_name }, local.default-tags, var.tags)
   vpc_id      = var.vpc
 
   ingress {
@@ -21,6 +21,27 @@ resource "aws_security_group" "alb" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "alb_aware" {
+  name        = local.alb_aware_sg_name
+  description = format("security group for %s", local.alb_aware_sg_name)
+  tags        = merge({ "Name" = local.alb_aware_sg_name }, local.default-tags, var.tags)
+  vpc_id      = var.vpc
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
   }
 
   egress {
