@@ -1,20 +1,14 @@
 ### network
-variable "vpc" {
-  description = "The vpc ID for loadbalancer"
-  type        = string
-  default     = null
-}
-
-variable "subnets" {
-  description = "The list of subnet IDs to deploy loadbalancer"
+variable "azs" {
+  description = "A list of availability zones for the vpc"
   type        = list(string)
-  default     = null
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
-### target
-variable "asg" {
-  description = "Autoscaling group name for target group attachment"
+variable "cidr" {
+  description = "The vpc CIDR (e.g. 10.0.0.0/16)"
   type        = string
+  default     = "10.0.0.0/16"
 }
 
 ### description
