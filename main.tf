@@ -102,6 +102,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size              = lookup(each.value, "max_size", 3)
   min_size              = lookup(each.value, "min_size", 1)
   desired_capacity      = lookup(each.value, "desired_size", 1)
+  target_group_arns     = lookup(each.value, "target_group_arns", null)
   force_delete          = true
   protect_from_scale_in = false
   termination_policies  = ["Default"]
