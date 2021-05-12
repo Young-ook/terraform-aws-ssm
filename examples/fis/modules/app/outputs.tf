@@ -1,14 +1,19 @@
 output "vpc" {
   description = "The generated Amazon VPC"
-  value       = module.app.vpc
+  value       = module.vpc.vpc
 }
 
 output "ec2" {
   description = "The generated AWS EC2 autoscaling group"
-  value       = module.app.ec2
+  value       = module.ec2.asg
+}
+
+output "role" {
+  description = "The attribute of IAM role for EC2 autoscaling group"
+  value       = module.ec2.role
 }
 
 output "alb" {
   description = "The generated AWS application loadbalancer"
-  value       = module.app.alb
+  value       = aws_lb.alb
 }

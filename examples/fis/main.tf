@@ -8,36 +8,14 @@ provider "aws" {
   region = var.aws_region
 }
 
-# vpc
-module "vpc" {
-  source              = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
-  name                = var.name
-  tags                = var.tags
-  azs                 = var.azs
-  cidr                = var.cidr
-  vpc_endpoint_config = var.vpc_endpoint_config
-  enable_igw          = var.enable_igw
-  enable_ngw          = var.enable_ngw
-  single_ngw          = var.single_ngw
-}
 
-# ec2
-module "ec2" {
-  source      = "../../"
-  name        = var.name
-  tags        = var.tags
-  subnets     = values(module.vpc.subnets["private"])
-  node_groups = var.node_groups
-}
-
-# alb
-module "alb" {
-  source  = "./modules/alb"
-  name    = var.name
-  tags    = var.tags
-  vpc     = module.vpc.vpc.id
-  subnets = values(module.vpc.subnets["public"])
-  asg     = module.ec2.asg.default.name
+# app
+module "app" {
+  source = "./modules/app"
+  name   = var.name
+  tags   = var.tags
+  azs    = var.azs
+  cidr   = var.cidr
 }
 
 # fis
@@ -47,7 +25,7 @@ module "fis" {
   tags   = var.tags
   region = var.aws_region
   azs    = var.azs
-  vpc    = module.vpc.vpc.id
-  asg    = module.ec2.asg.default.name
-  role   = module.ec2.role.arn
+  vpc    = module.app.vpc.id
+  asg    = module.app.ec2.web.name
+  role   = module.app.role.arn
 }

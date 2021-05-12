@@ -80,7 +80,7 @@ resource "aws_launch_template" "asg" {
   }
 
   network_interfaces {
-    #    security_groups       = []
+    security_groups       = lookup(each.value, "security_groups", [])
     delete_on_termination = true
   }
 
