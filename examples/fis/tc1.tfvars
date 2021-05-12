@@ -17,5 +17,6 @@ node_groups = [
     max_size      = 3
     desired_size  = 3
     instance_type = "t3.small"
+    user_data     = "#!/bin/bash\nyum update -y\nyum install -y httpd\nsystemctl start httpd\nsystemctl enable httpd"
   }
 ]
