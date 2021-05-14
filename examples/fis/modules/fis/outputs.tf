@@ -44,15 +44,30 @@ resource "local_file" "throttle-ec2-api" {
   file_permission = "0600"
 }
 
-resource "local_file" "experiments" {
+resource "local_file" "create-templates" {
   content = join("\n", [
     "#!/bin/bash -ex",
-    "aws fis create-experiment-template --cli-input-json file://cpu-stress.json",
-    "aws fis create-experiment-template --cli-input-json file://network-latency.json",
-    "aws fis create-experiment-template --cli-input-json file://terminate-instances.json",
-    "aws fis create-experiment-template --cli-input-json file://throttle-ec2-api.json",
+    "OUTPUT='.fis_cli_result'",
+    "TEMPLATES=('cpu-stress.json' 'network-latency.json' 'terminate-instances.json' 'throttle-ec2-api.json')",
+    "for template in $${TEMPLATES[@]}; do",
+    "  aws fis create-experiment-template --cli-input-json file://$${template} --output text --query 'experimentTemplate.id' 2>&1 | tee -a $${OUTPUT}",
+    "done",
     ]
   )
-  filename        = "${path.cwd}/fis-create-experiments.sh"
+  filename        = "${path.cwd}/fis-create-experiment-templates.sh"
+  file_permission = "0700"
+}
+
+resource "local_file" "delete-templates" {
+  content = join("\n", [
+    "#!/bin/bash -ex",
+    "OUTPUT='.fis_cli_result'",
+    "while read id; do",
+    "  aws fis delete-experiment-template --id $${id} --output text --query 'experimentTemplate.id'",
+    "done < $${OUTPUT}",
+    "rm $${OUTPUT}",
+    ]
+  )
+  filename        = "${path.cwd}/fis-delete-experiment-templates.sh"
   file_permission = "0700"
 }
