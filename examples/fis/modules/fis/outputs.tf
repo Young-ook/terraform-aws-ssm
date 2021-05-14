@@ -44,13 +44,13 @@ resource "local_file" "throttle-ec2-api" {
   file_permission = "0600"
 }
 
-resource "local_file" "experiments" {
+resource "local_file" "experiment-templates" {
   content = join("\n", [
     "#!/bin/bash -ex",
-    "aws fis create-experiment-template --cli-input-json file://cpu-stress.json",
-    "aws fis create-experiment-template --cli-input-json file://network-latency.json",
-    "aws fis create-experiment-template --cli-input-json file://terminate-instances.json",
-    "aws fis create-experiment-template --cli-input-json file://throttle-ec2-api.json",
+    "TEMPLATES=('cpu-stress.json' 'network-latency.json' 'terminate-instances.json' 'throttle-ec2-api.json')",
+    "for template in $${TEMPLATES[@]}; do",
+    "  id=$(aws fis create-experiment-template --cli-input-json file://$template --output text --query 'experimentTemplate.id')",
+    "done",
     ]
   )
   filename        = "${path.cwd}/fis-create-experiments.sh"
