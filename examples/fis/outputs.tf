@@ -12,3 +12,16 @@ output "alb" {
   description = "The generated AWS application loadbalancer"
   value       = module.app.alb
 }
+
+output "vclient" {
+  description = "Script to call APIs as a virtual client"
+  value = join("\n", [
+    "#!/bin/bash",
+    "while true; do",
+    "  curl -I http://${module.app.alb.dns_name}",
+    "  echo",
+    "  sleep .5",
+    "done",
+    ]
+  )
+}
