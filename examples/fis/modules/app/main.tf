@@ -116,7 +116,7 @@ module "ec2" {
       max_size          = 3
       desired_size      = 3
       instance_type     = "t3.small"
-      security_groups   = [aws_security_group.alb.id]
+      security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
     }
