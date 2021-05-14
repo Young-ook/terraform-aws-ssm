@@ -19,13 +19,14 @@ variable "vpc" {
 }
 
 ### target
-variable "asg" {
-  description = "Autoscaling group name of fault injection target"
+variable "role" {
+  description = "Role ARN of autoscaling group of fault injection target"
   type        = string
 }
 
-variable "role" {
-  description = "Role ARN of autoscaling group of fault injection target"
+### alarm
+variable "alarm" {
+  description = "The ARN of cloudwatch alarm to stop fault injection experiment"
   type        = string
 }
 
