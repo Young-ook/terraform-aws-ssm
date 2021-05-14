@@ -26,6 +26,6 @@ module "fis" {
   region = var.aws_region
   azs    = var.azs
   vpc    = module.app.vpc.id
-  asg    = module.app.ec2.web.name
+  alarm  = module.app.alarm.arn
   role   = module.app.role.arn
 }

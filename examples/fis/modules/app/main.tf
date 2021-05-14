@@ -16,7 +16,7 @@ module "vpc" {
 resource "aws_lb" "alb" {
   name                       = local.name
   tags                       = merge(local.default-tags, var.tags)
-  internal                   = false
+  internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.alb.id]
   subnets                    = values(module.vpc.subnets["public"])
@@ -34,7 +34,7 @@ resource "aws_security_group" "alb" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.cidr]
   }
 
   egress {
@@ -79,7 +79,7 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_lb_target_group" "http" {
   depends_on           = [aws_lb.alb]
-  name                 = local.name
+  name                 = join("-", [local.name, "http"])
   tags                 = merge(local.default-tags, var.tags)
   vpc_id               = module.vpc.vpc.id
   port                 = 80
@@ -93,10 +93,6 @@ resource "aws_lb_target_group" "http" {
     path     = "/"
     port     = "traffic-port"
     protocol = "HTTP"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -118,4 +114,41 @@ module "ec2" {
       user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
     }
   ]
+}
+
+### application/monitoring
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name                = local.cw_cpu_alarm_name
+  alarm_description         = "This metric monitors ec2 cpu utilization"
+  tags                      = merge(local.default-tags, var.tags)
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 2
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/EC2"
+  period                    = 60
+  statistic                 = "Average"
+  threshold                 = 40
+  insufficient_data_actions = []
+
+  dimensions = {
+    AutoScalingGroupName = module.ec2.asg.web.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "p90" {
+  alarm_name          = local.cw_p90_alarm_name
+  alarm_description   = "This metric monitors percentile of response latency"
+  tags                = merge(local.default-tags, var.tags)
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "TargetResponseTime"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  unit                = "Seconds"
+  threshold           = 0.1
+  extended_statistic  = "p90"
+
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
 }

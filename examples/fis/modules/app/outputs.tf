@@ -17,3 +17,8 @@ output "alb" {
   description = "The generated AWS application loadbalancer"
   value       = aws_lb.alb
 }
+
+output "alarm" {
+  description = "Unsteady state alarm to stop fault injection experiment"
+  value       = aws_cloudwatch_metric_alarm.cpu
+}
