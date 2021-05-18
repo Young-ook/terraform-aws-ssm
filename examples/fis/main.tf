@@ -26,6 +26,6 @@ module "fis" {
   region = var.aws_region
   azs    = var.azs
   vpc    = module.app.vpc.id
-  alarm  = module.app.alarm.arn
+  alarm  = module.app.alarm["cpu"].arn
   role   = module.app.role.arn
 }

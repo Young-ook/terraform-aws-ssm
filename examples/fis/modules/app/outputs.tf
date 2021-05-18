@@ -20,5 +20,8 @@ output "alb" {
 
 output "alarm" {
   description = "Unsteady state alarm to stop fault injection experiment"
-  value       = aws_cloudwatch_metric_alarm.cpu
+  value = {
+    cpu = aws_cloudwatch_metric_alarm.cpu
+    p90 = aws_cloudwatch_metric_alarm.p90
+  }
 }
