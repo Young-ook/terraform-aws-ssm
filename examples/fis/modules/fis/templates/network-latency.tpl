@@ -4,7 +4,7 @@
     },
     "description": "Run a Network latency fault injection on the specified instance",
     "targets": {
-        "myInstance": {
+        "ec2-instances": {
             "resourceType": "aws:ec2:instance",
             "resourceTags": {
                 "env": "prod"
@@ -28,7 +28,7 @@
                 "documentParameters": "{\"DurationSeconds\": \"120\", \"InstallDependencies\": \"True\", \"DelayMilliseconds\": \"1000\"}"
             },
             "targets": {
-                "Instances": "myInstance"
+                "Instances": "ec2-instances"
             }
         }
     },

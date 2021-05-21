@@ -4,7 +4,7 @@
     },
     "description": "Throttle the specified EC2 API actions on the specified IAM role",
     "targets": {
-        "myRole": {
+        "ec2-role": {
             "resourceType": "aws:iam:role",
             "resourceArns": ["${asg_role}"],
             "selectionMode": "ALL"
@@ -21,7 +21,7 @@
                 "duration": "PT2M"
             },
             "targets": {
-                "Roles": "myRole"
+                "Roles": "ec2-role"
             }
         }
     },

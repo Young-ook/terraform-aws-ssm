@@ -2,9 +2,9 @@
     "tags": {
         "Name": "TerminateEC2InstancesWithFilters"
     },
-    "description": "Terminate all instances in us-east-1b with the tag env=prod in the specified VPC",
+    "description": "Terminate all instances with the tag env=prod in the specified VPC",
     "targets": {
-        "myInstances": {
+        "ec2-instances": {
             "resourceType": "aws:ec2:instance",
             "resourceTags": {
                 "env": "prod"
@@ -27,11 +27,11 @@
         }
     },
     "actions": {
-        "StopInstances": {
+        "TerminateInstances": {
             "actionId": "aws:ec2:terminate-instances",
             "description": "teminate the instances",
             "targets": {
-                "Instances": "myInstances"
+                "Instances": "ec2-instances"
             }
         }
     },
