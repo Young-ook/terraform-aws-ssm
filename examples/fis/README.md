@@ -67,7 +67,7 @@ Replace the alarm for stop condition with "p90" from "cpu" on the edit page of e
 1. Select `experiment templates` on the navigation bar.
 1. Find out `NetworkLatency` template from the list and select.
 1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
-1. Scroll down to the bottom of edit page. And update the stop condition alarm to `xxxx-p90-alarm` and save.
+1. Scroll down to the bottom of edit page. And update the stop condition alarm to `blah-xxxx-p90-alarm` and save.
 
 ![aws-fis-stop-condition-update-p90](../../images/aws-fis-stop-condition-update-p90.png)
 
