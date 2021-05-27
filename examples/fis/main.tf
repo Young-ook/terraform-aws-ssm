@@ -8,7 +8,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-
 # app
 module "app" {
   source = "./modules/app"
