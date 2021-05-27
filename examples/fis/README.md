@@ -59,9 +59,8 @@ Following screenshot shows how it works. First line shows the request and repons
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
 ### Stop condition
-#### Switch alarm
-To test stop condition with cloudwatch alarm, we have to update the terraform configuration to pass the ARN of p90 latency alarm.
-Replace the alarm for stop condition with "p90" from "cpu" on the edit page of experiment template on the AWS management console.
+#### Update alarm source
+To test stop condition with cloudwatch alarm, we have to replace the stop condition with p90 latency alarm on the edit page of experiment template on the AWS management console.
 
 1. Move on the FIS service page.
 1. Select `experiment templates` on the navigation bar.
