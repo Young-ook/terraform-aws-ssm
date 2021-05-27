@@ -58,6 +58,36 @@ Following screenshot shows how it works. First line shows the request and repons
 
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
+### Stop condition
+#### Switch alarm
+To test stop condition with cloudwatch alarm, we have to update the terraform configuration to pass the ARN of p90 latency alarm.
+Replace the alarm for stop condition with "p90" from "cpu" on the edit page of experiment template on the AWS management console.
+
+1. Move on the FIS service page.
+1. Select `experiment templates` on the navigation bar.
+1. Find out `NetworkLatency` template from the list and select.
+1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
+1. Scroll down to the bottom of edit page. And update the stop condition alarm to `xxxx-p90-alarm` and save.
+
+![aws-fis-stop-condition-update-p90](../../images/aws-fis-stop-condition-update-p90.png)
+
+#### Run load generator
+Enter an ec2 instance via session manager and run virtual client script runs loop action for http requests on the target application load balancer. You will find out the example script for virtual client load generater on the terraform outputs after terraform apply command is complete. It looks like below.
+```
+#!/bin/bash
+while true; do
+  curl -I http://my-loadbalancer-1234567890.us-west-2.elb.amazonaws.com
+  echo
+  sleep .5
+done
+```
+The cloudwatch alarm will be chaged to OK status in minutes after the load generator script running.
+
+### Network latency injection
+We are now ready to start network latecy fault injection and test the emergency stop of aws fault injection simulator is working well to reduce the customer impact.
+
+![aws-fis-api-latency-alarm-p90](../../images/aws-fis-api-latency-alarm-p90.png)
+
 ## Clean up
 ### Delete experiment templates
 Run script
