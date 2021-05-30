@@ -14,12 +14,12 @@ module "vpc" {
 
 ### application/network
 resource "aws_lb" "alb" {
-  name                       = local.name
+  name                       = local.alb_name
   tags                       = merge(local.default-tags, var.tags)
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.alb.id]
-  subnets                    = values(module.vpc.subnets["public"])
+  subnets                    = values(module.vpc.subnets["private"])
   enable_deletion_protection = false
 }
 
@@ -86,7 +86,7 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_lb_target_group" "http" {
   depends_on           = [aws_lb.alb]
-  name                 = join("-", [local.name, "http"])
+  name                 = join("-", [local.alb_name, "http"])
   tags                 = merge(local.default-tags, var.tags)
   vpc_id               = module.vpc.vpc.id
   port                 = 80
@@ -105,7 +105,7 @@ resource "aws_lb_target_group" "http" {
 
 ### application/ec2
 module "ec2" {
-  source  = "../../../../"
+  source  = "../../"
   name    = var.name
   tags    = var.tags
   subnets = values(module.vpc.subnets["private"])

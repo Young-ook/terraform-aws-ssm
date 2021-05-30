@@ -1,7 +1,40 @@
+module "current" {
+  source  = "Young-ook/spinnaker/aws//modules/aws-partitions"
+  version = ">= 2.0"
+}
+
+resource "aws_iam_role" "fis-run" {
+  name = local.fis_name
+  tags = merge(local.default-tags, var.tags)
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = [format("fis.%s", module.current.partition.dns_suffix)]
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fis-run" {
+  policy_arn = format("arn:%s:iam::aws:policy/PowerUserAccess", module.current.partition.partition)
+  role       = aws_iam_role.fis-run.id
+}
+
+### fault injection simulator experiment templates
+
+locals {
+  target_vpc           = module.vpc.vpc.id
+  target_role          = module.ec2.role.arn
+  stop_condition_alarm = aws_cloudwatch_metric_alarm.cpu.arn
+}
+
 resource "local_file" "cpu-stress" {
   content = templatefile("${path.module}/templates/cpu-stress.tpl", {
-    region = var.region
-    alarm  = var.alarm
+    region = var.aws_region
+    alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
   })
   filename        = "${path.cwd}/cpu-stress.json"
@@ -10,8 +43,8 @@ resource "local_file" "cpu-stress" {
 
 resource "local_file" "network-latency" {
   content = templatefile("${path.module}/templates/network-latency.tpl", {
-    region = var.region
-    alarm  = var.alarm
+    region = var.aws_region
+    alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
   })
   filename        = "${path.cwd}/network-latency.json"
@@ -26,8 +59,8 @@ resource "random_integer" "az" {
 resource "local_file" "terminate-instances" {
   content = templatefile("${path.module}/templates/terminate-instances.tpl", {
     az    = var.azs[random_integer.az.result]
-    vpc   = var.vpc
-    alarm = var.alarm
+    vpc   = local.target_vpc
+    alarm = local.stop_condition_alarm
     role  = aws_iam_role.fis-run.arn
   })
   filename        = "${path.cwd}/terminate-instances.json"
@@ -36,8 +69,8 @@ resource "local_file" "terminate-instances" {
 
 resource "local_file" "throttle-ec2-api" {
   content = templatefile("${path.module}/templates/throttle-ec2-api.tpl", {
-    asg_role = var.role
-    alarm    = var.alarm
+    asg_role = local.target_role
+    alarm    = local.stop_condition_alarm
     role     = aws_iam_role.fis-run.arn
   })
   filename        = "${path.cwd}/throttle-ec2-api.json"
