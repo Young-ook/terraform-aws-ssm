@@ -59,8 +59,10 @@ Following screenshot shows how it works. First line shows the request and repons
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
 ### Stop condition
+This scenario shows how to abort an experiment when an emergency alert is raised. This is a very important feature for reducing customer impact during chaotic engineering of production systems. Some experiments have a lot of impact on customers during fault injection. If the application goes wrong, the experiment must be stopped autumatically.
+
 #### Update alarm source
-To test stop condition with cloudwatch alarm, we have to replace the stop condition with p90 latency alarm on the edit page of experiment template on the AWS management console.
+To test stop condition with cloudwatch alarm, we have to replace the stop condition with p90 latency alarm on the edit page of experiment template on the AWS management console. We will use this alarm for stop condition of fault injection experiment. This alarm means that our application has latency issues with user responses.
 
 1. Move on the FIS service page.
 1. Select `experiment templates` on the navigation bar.
@@ -86,6 +88,16 @@ The cloudwatch alarm will be chaged to OK status in minutes after the load gener
 We are now ready to start network latecy fault injection and test the emergency stop of aws fault injection simulator is working well to reduce the customer impact.
 
 ![aws-fis-api-latency-alarm-p90](../../images/aws-fis-api-latency-alarm-p90.png)
+
+### Adjust targets
+After the emergency button test, we can start a new experiment to prove the hypothesis that when 30% of the servers are shut down, the servers can respond within an average of 100ms.
+
+1. Move on the FIS service page.
+1. Select `experiment templates` on the navigation bar.
+1. Find out `NetworkLatency` template from the list and select.
+1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
+1. Scroll down to the bottom of edit page. And update the stop condition alarm to `blah-xxxx-p90-alarm` and save.
+
 
 ## Clean up
 ### Delete experiment templates
