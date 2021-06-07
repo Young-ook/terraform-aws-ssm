@@ -25,7 +25,7 @@
             "parameters": {
                 "duration": "PT5M",
                 "documentArn": "arn:aws:ssm:${region}::document/AWSFIS-Run-Network-Latency",
-                "documentParameters": "{\"DurationSeconds\": \"300\", \"InstallDependencies\": \"True\", \"DelayMilliseconds\": \"1000\"}"
+                "documentParameters": "{\"DurationSeconds\": \"300\", \"InstallDependencies\": \"True\", \"DelayMilliseconds\": \"100\"}"
             },
             "targets": {
                 "Instances": "ec2-instances"
