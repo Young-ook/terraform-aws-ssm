@@ -95,14 +95,15 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_target_group" "http" {
-  depends_on           = [aws_lb.alb]
-  name                 = join("-", [local.alb_name, "http"])
-  tags                 = merge(local.default-tags, var.tags)
-  vpc_id               = module.vpc.vpc.id
-  port                 = 80
-  protocol             = "HTTP"
-  target_type          = "instance"
-  deregistration_delay = 10
+  depends_on                    = [aws_lb.alb]
+  name                          = join("-", [local.alb_name, "http"])
+  tags                          = merge(local.default-tags, var.tags)
+  vpc_id                        = module.vpc.vpc.id
+  port                          = 80
+  protocol                      = "HTTP"
+  target_type                   = "instance"
+  load_balancing_algorithm_type = "least_outstanding_requests"
+  deregistration_delay          = 10
 
   health_check {
     enabled  = true
