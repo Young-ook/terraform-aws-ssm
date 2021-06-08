@@ -5,7 +5,7 @@ output "vclient" {
     "while true; do",
     "  curl -I http://${aws_lb.alb.dns_name}",
     "  echo",
-    "  sleep .5",
+    "  sleep .1",
     "done",
     ]
   )

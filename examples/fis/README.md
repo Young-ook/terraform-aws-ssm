@@ -59,8 +59,10 @@ Following screenshot shows how it works. First line shows the request and repons
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
 ### Stop condition
+This scenario shows how to abort an experiment when an emergency alert is raised. This is a very important feature for reducing customer impact during chaotic engineering of production systems. Some experiments have a lot of impact on customers during fault injection. If the application goes wrong, the experiment must be stopped autumatically.
+
 #### Update alarm source
-To test stop condition with cloudwatch alarm, we have to replace the stop condition with p90 latency alarm on the edit page of experiment template on the AWS management console.
+To test stop condition with cloudwatch alarm, we have to replace the stop condition with p90 latency alarm on the edit page of experiment template on the AWS management console. We use ‘p90’ to refer to the 90th percentile data; that is, 90% of the observations fall below this value. Percentiles for p90, p95, p99, p99.9, p99.99 or any other percentile from 0.1 to 100 in increments of 0.1% (including p100) of request metric can now be visualized in near real time. We will use this alarm for stop condition of fault injection experiment. This alarm means that our application has latency issues with user responses.
 
 1. Move on the FIS service page.
 1. Select `experiment templates` on the navigation bar.
@@ -82,10 +84,40 @@ done
 ```
 The cloudwatch alarm will be chaged to OK status in minutes after the load generator script running.
 
-### Network latency injection
-We are now ready to start network latecy fault injection and test the emergency stop of aws fault injection simulator is working well to reduce the customer impact.
+#### Network latency injection
+We are now ready to start network latecy fault injection and test the emergency stop of aws fault injection simulator is working well to reduce the customer impact. Go to the AWS FIS service page and select `NetworkLatency` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS injects network latency into the target, which are the EC2 instances we configured in the experiment template. This will delay all requests from the load generator executed in the previous step by 100ms. This experiment is automatically stopped when the p90 latency alarm is triggered.
 
 ![aws-fis-api-latency-alarm-p90](../../images/aws-fis-api-latency-alarm-p90.png)
+
+![aws-fis-ec2-network-latency-action-stop](../../images/aws-fis-ec2-network-latency-action-stop.png)
+
+### Architecture improvements
+#### Adjust targets
+After the emergency button test, A new experiment can be started to prove the hypothesis that even if one of the servers in the cluster suddenly slows down, the entire application service can respond within an average of 100 ms.
+
+1. Move on the AWS FIS service page.
+1. Select `experiment templates` on the navigation bar.
+1. Find out `NetworkLatency` template from the list and select.
+1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
+1. Scroll down to `Targets` configuration. And select ec2-instances(aws:ec2:instance) item. Expands the item and click *Edit* button.
+1. On the edit target popup window, changed the selection mode with `Count` and set the value of `Number of resources` to 1.
+1. Save and close.
+
+![aws-fis-target-selection-mode-count](../../images/aws-fis-target-selection-mode-count.png)
+
+#### Scale-out nodes
+Increase the capacity of the ec2 autoscaling group to distribute requests from the load balancer. This will help reduce p90 latency by distributing the load when aws fis creates network latency situations for the target.
+
+1. Go to the Amazon EC2 service page.
+1. Select `Autoscaling group` on the bottom of navigation bar.
+1. On the Auto Scaling groups page, select the check box next to the Auto Scaling group whose settings you want to manage. The name is something like this `ssm-fis-xxxx`. A split pane opens up in the bottom part of the Auto Scaling groups page, showing information about the group that's selected.
+1. In the lower pane, in the Details tab, view or change the current settings for minimum, maximum, and desired capacity.
+1. Update the desired capacity to 9.
+
+#### Rerun network latency experiment
+Back to the AWS FIS service page, and rerun the network latency experiment against the updated target to ensure that the API response is in the previously assumed steady state. In this case, the p90 delay alarm is not triggered. That is, 90% of the data points for latency are faster than the threshold. Therefore this experiment will be completed normaly.
+
+![aws-fis-ec2-network-latency-action-complete](../../images/aws-fis-ec2-network-latency-action-complete.png)
 
 ## Clean up
 ### Delete experiment templates
