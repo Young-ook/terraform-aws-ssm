@@ -152,8 +152,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "p90" {
-  alarm_name          = local.cw_p90_alarm_name
+resource "aws_cloudwatch_metric_alarm" "api-p90" {
+  alarm_name          = local.cw_api_p90_alarm_name
   alarm_description   = "This metric monitors percentile of response latency"
   tags                = merge(local.default-tags, var.tags)
   comparison_operator = "GreaterThanThreshold"
@@ -164,6 +164,24 @@ resource "aws_cloudwatch_metric_alarm" "p90" {
   unit                = "Seconds"
   threshold           = 0.1
   extended_statistic  = "p90"
+
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "api-avg" {
+  alarm_name          = local.cw_api_avg_alarm_name
+  alarm_description   = "This metric monitors average time of response latency"
+  tags                = merge(local.default-tags, var.tags)
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "TargetResponseTime"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  unit                = "Seconds"
+  statistic           = "Average"
+  threshold           = 0.1
 
   dimensions = {
     LoadBalancer = aws_lb.alb.arn_suffix
