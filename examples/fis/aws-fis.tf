@@ -77,11 +77,22 @@ resource "local_file" "throttle-ec2-api" {
   file_permission = "0600"
 }
 
+resource "local_file" "terminate-eks-nodes" {
+  content = templatefile("${path.module}/templates/terminate-eks-nodes.tpl", {
+    az    = var.azs[random_integer.az.result]
+    vpc   = local.target_vpc
+    alarm = local.stop_condition_alarm
+    role  = aws_iam_role.fis-run.arn
+  })
+  filename        = "${path.cwd}/terminate-eks-nodes.json"
+  file_permission = "0600"
+}
+
 resource "local_file" "create-templates" {
   content = join("\n", [
     "#!/bin/bash -ex",
     "OUTPUT='.fis_cli_result'",
-    "TEMPLATES=('cpu-stress.json' 'network-latency.json' 'terminate-instances.json' 'throttle-ec2-api.json')",
+    "TEMPLATES=('cpu-stress.json' 'network-latency.json' 'terminate-instances.json' 'throttle-ec2-api.json' 'terminate-eks-nodes.json')",
     "for template in $${TEMPLATES[@]}; do",
     "  aws fis create-experiment-template --cli-input-json file://$${template} --output text --query 'experimentTemplate.id' 2>&1 | tee -a $${OUTPUT}",
     "done",

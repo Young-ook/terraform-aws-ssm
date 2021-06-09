@@ -134,6 +134,25 @@ module "ec2" {
   ]
 }
 
+### application/eks
+module "eks" {
+  source             = "Young-ook/eks/aws"
+  name               = var.name
+  tags               = var.tags
+  subnets            = values(module.vpc.subnets["private"])
+  kubernetes_version = "1.19"
+  enable_ssm         = true
+  managed_node_groups = [
+    {
+      name          = "default"
+      min_size      = 1
+      max_size      = 3
+      desired_size  = 3
+      instance_type = "t3.small"
+    }
+  ]
+}
+
 ### application/monitoring
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name                = local.cw_cpu_alarm_name
