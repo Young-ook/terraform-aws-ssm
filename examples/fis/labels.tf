@@ -5,7 +5,7 @@ locals {
   cw_cpu_alarm_name     = join("-", [var.name, "cpu-alarm"])
   cw_api_p90_alarm_name = join("-", [var.name, "api-p90-alarm"])
   cw_api_avg_alarm_name = join("-", [var.name, "api-avg-alarm"])
-  fis_name              = join("-", [var.name, "fis"])
+  fis_role_name         = join("-", [var.name, "role"])
   default-tags = merge(
     { "terraform.io" = "managed" },
   )

@@ -4,7 +4,7 @@ module "current" {
 }
 
 resource "aws_iam_role" "fis-run" {
-  name = local.fis_name
+  name = local.fis_role_name
   tags = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
     Statement = [{
