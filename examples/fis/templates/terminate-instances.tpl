@@ -29,7 +29,7 @@
     "actions": {
         "TerminateInstances": {
             "actionId": "aws:ec2:terminate-instances",
-            "description": "teminate the instances",
+            "description": "terminate the instances",
             "targets": {
                 "Instances": "ec2-instances"
             }
