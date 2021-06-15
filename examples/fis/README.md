@@ -150,13 +150,42 @@ Following screenshot shows how it works. First line shows the request and repons
 
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
-### Run Load Generator
-TODO: Run load generator inside kubernetes
-
 ### Terminate EKS Nodes
 AWS FIS allows you to test resilience of EKS cluster node groups. See what happens if you shut down some ec2 nodes for kubernetes pods or services within a certain percentage. This test verifies that the EKS managed node group launches new instances to meet the defined desired capacity and ensures that the application containers continues to run well. Also, this test will help you understand what happens to your application when you upgrade your cluster. At this time, in order to satisfy both resiliency and ease of cluster upgrade, the container should be designed so that it can be moved easily. This makes it easy to move containers running on the failed node to another node to continue working. This is an important part of a cloud-native architecture.
 
+#### Update kubeconfig
+Update and download kubernetes config file to local. You can see the bash command like below after terraform apply is complete. Copy this and run it to save the kubernetes configuration file to your local workspace. And export it as an environment variable to apply to the terminal.
+```
+bash -e .terraform/modules/eks/script/update-kubeconfig.sh -r ap-northeast-2 -n ssm-fis -k kubeconfig
+export KUBECONFIG=kubeconfig
+```
+
+#### Microservices Architecture Application
+For this lab, we picked up the Sock Shop application. Sock Shop is a microservices architecture sample application that Weaveworks initially developed. They made it open source so it can be used by other organizations for learning and demonstration purposes.
+
+Create the namespace and deploy application.
+```
+kubectl create namespace sock-shop
+kubectl apply -f manifests/sockshop-complete-demo.yaml
+```
+
+Everything looks good, access the endpoint of the application.
+```
+kubectl port-forward -n sock-shop svc/front-end 8079:80
+```
+
+Open  http://localhost:8079 on your web browser.
+
+![weaveworks-sockshop-frontend](../../images/weaveworks-sockshop-frontend.png)
+
+🎉 Congrats, you’ve deployed the sample application on your cluster.
+
+#### Run Load Generator
+TODO: Run load generator inside kubernetes
+
 #### Define Steady State
+Before we begin a failure experiment, we need to validate the user experience and revise the dashboard and metrics to understand that the systems are working under normal state, in other words, steady state.
+
 #### Run Experiment
 Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS shuts down EKS nodes for up to 70% of currently running instances. This value was configured in the experiment template and you can edit this value in the target selection mode configuration if you want to change the number of EKS nodes to shut down You can see the terminated instances on the EC2 service page, and the new instances will appear shortly after the EKS node is shut down.
 
