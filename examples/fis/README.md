@@ -1,4 +1,21 @@
 # AWS Fault Injection Simulator
+[AWS Fault Injection Simulator](https://aws.amazon.com/fis/) is a fully managed service for running fault injection experiments on AWS that makes it easier to improve an application’s performance, observability, and resiliency. Fault injection experiments are used in chaos engineering, which is the practice of stressing an application in testing or production environments by creating disruptive events, such as sudden increase in CPU or memory consumption, observing how the system responds, and implementing improvements.
+
+## Chaos Engineering
+### Why Chaos Engineering
+There are many reasons to do chaos engineering. We see teams transitioning in this way to reduce incidents, lower downtime costs, train their teams, and prepare for critical moments. Practicing chaos engineering allows you to detect problems before they become accidents and before customers are affected. And chaos engineering is useful for reducing downtime costs because it allows teams to have a resilient architecture. While the number of companies operating at Internet scale increases and high-traffic events such as sales or launches increase, the cost of downtime will become more expensive. Additionally, this continuous practice of chaos engineering gives teams more confidence every day as they build their own applications and systems. It takes less time to fire-fighting and more time to create and create value.
+
+### How to do Chaos Engineering
+To implement Chaos Engineering, one should follow the scientific method to implement experiments:
+1. Observe Your System
+1. Baseline your metrics
+1. Form a Hypothesis with Abort (Stop) Conditions
+1. Define Blast Radius
+1. Run Experiment
+1. Analyze Results
+1. Expand Scope and Re-Test
+1. Share Results
+
 ## Setup
 [This](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/fis/main.tf) is an example of terraform configuration file to create AWS Fault Injection Simulator experiments for chaos engineering. Check out and apply it using terraform command.
 
