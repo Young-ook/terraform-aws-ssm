@@ -190,7 +190,7 @@ In your Cloud9 IDE, run the application.
 ```
 $ kubectl -n sock-shop port-forward svc/front-end 8080:80
 ```
-Click **Preview** and **Preview Running Application**. This opens up a preview tab and shows the Sock Shop main page.
+Click `Preview` and `Preview Running Application`. This opens up a preview tab and shows the Sock Shop main page.
 
 ![weaveworks-sockshop-frontend](../../images/weaveworks-sockshop-frontend.png)
 
