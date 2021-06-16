@@ -33,6 +33,7 @@ locals {
 
 resource "local_file" "cpu-stress" {
   content = templatefile("${path.module}/templates/cpu-stress.tpl", {
+    asg    = module.ec2.asg.web.name
     region = var.aws_region
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
@@ -43,6 +44,7 @@ resource "local_file" "cpu-stress" {
 
 resource "local_file" "network-latency" {
   content = templatefile("${path.module}/templates/network-latency.tpl", {
+    asg    = module.ec2.asg.web.name
     region = var.aws_region
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
@@ -58,6 +60,7 @@ resource "random_integer" "az" {
 
 resource "local_file" "terminate-instances" {
   content = templatefile("${path.module}/templates/terminate-instances.tpl", {
+    asg   = module.ec2.asg.web.name
     az    = var.azs[random_integer.az.result]
     vpc   = local.target_vpc
     alarm = local.stop_condition_alarm
