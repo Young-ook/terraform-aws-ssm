@@ -181,9 +181,9 @@ front-end-7b8bcd59cb-wd527   1/1     Running   0          9s
 ##### Local Workspace
 In your local workspace, connect through a proxy to access your application's endpoint.
 ```
-$ kubectl -n sock-shop port-forward svc/front-end 8079:80
+$ kubectl -n sock-shop port-forward svc/front-end 8080:80
 ```
-Open `http://localhost:8079` on your web browser. This shows the Sock Shop main page.
+Open `http://localhost:8080` on your web browser. This shows the Sock Shop main page.
 
 ##### Cloud9
 In your Cloud9 IDE, run the application.
