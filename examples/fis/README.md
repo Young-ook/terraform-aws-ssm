@@ -7,10 +7,10 @@ There are many reasons to do chaos engineering. We see teams transitioning in th
 
 ### How to do Chaos Engineering
 To implement Chaos Engineering, one should follow the scientific method to implement experiments:
-1. Observe Your System
+1. Observe your system
 1. Baseline your metrics
-1. Form a Hypothesis with Abort (Stop) Conditions
-1. Define Blast Radius
+1. Define Steady State
+1. Form a Hypothesis with Abort Conditions (Blast Radius)
 1. Run Experiment
 1. Analyze Results
 1. Expand Scope and Re-Test
@@ -204,6 +204,8 @@ $ kubectl apply -f manifests/sockshop-loadtest.yaml
 
 #### Define Steady State
 Before we begin a failure experiment, we need to validate the user experience and revise the dashboard and metrics to understand that the systems are working under normal state, in other words, steady state.
+
+![aws-cw-container-insights](../../images/aws-cw-container-insights.png)
 
 #### Run Experiment
 Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS shuts down EKS nodes for up to 70% of currently running instances. This value was configured in the experiment template and you can edit this value in the target selection mode configuration if you want to change the number of EKS nodes to shut down You can see the terminated instances on the EC2 service page, and the new instances will appear shortly after the EKS node is shut down.
