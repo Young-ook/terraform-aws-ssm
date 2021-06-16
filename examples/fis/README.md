@@ -156,8 +156,8 @@ AWS FIS allows you to test resilience of EKS cluster node groups. See what happe
 #### Update kubeconfig
 Update and download kubernetes config file to local. You can see the bash command like below after terraform apply is complete. Copy this and run it to save the kubernetes configuration file to your local workspace. And export it as an environment variable to apply to the terminal.
 ```
-bash -e .terraform/modules/eks/script/update-kubeconfig.sh -r ap-northeast-2 -n ssm-fis -k kubeconfig
-export KUBECONFIG=kubeconfig
+$ bash -e .terraform/modules/eks/script/update-kubeconfig.sh -r ap-northeast-2 -n ssm-fis -k kubeconfig
+$ export KUBECONFIG=kubeconfig
 ```
 
 #### Microservices Architecture Application
@@ -165,23 +165,42 @@ For this lab, we picked up the Sock Shop application. Sock Shop is a microservic
 
 Create the namespace and deploy application.
 ```
-kubectl create namespace sock-shop
-kubectl apply -f manifests/sockshop-complete-demo.yaml
+$ kubectl create namespace sock-shop
+$ kubectl apply -f manifests/sockshop-complete-demo.yaml
+```
+Verify that the pod came up fine (ensure nothing else is running on port 8079):
+```
+$ kubectl -n sock-shop get pod -l name=front-end
+```
+The output will be something like this:
+```
+NAME                         READY   STATUS    RESTARTS   AGE
+front-end-7b8bcd59cb-wd527   1/1     Running   0          9s
 ```
 
-Everything looks good, access the endpoint of the application.
+##### Local Workspace
+In your local workspace, connect through a proxy to access your application's endpoint.
 ```
-kubectl port-forward -n sock-shop svc/front-end 8079:80
+$ kubectl -n sock-shop port-forward svc/front-end 8079:80
 ```
+Open `http://localhost:8079` on your web browser. This shows the Sock Shop main page.
 
-Open  http://localhost:8079 on your web browser.
+##### Cloud9
+In your Cloud9 IDE, run the application.
+```
+$ kubectl -n sock-shop port-forward svc/front-end 8080:80
+```
+Click **Preview** and **Preview Running Application**. This opens up a preview tab and shows the Sock Shop main page.
 
 ![weaveworks-sockshop-frontend](../../images/weaveworks-sockshop-frontend.png)
 
 🎉 Congrats, you’ve deployed the sample application on your cluster.
 
 #### Run Load Generator
-TODO: Run load generator inside kubernetes
+Run load generator inside kubernetes
+```
+$ kubectl apply -f manifests/sockshop-loadtest.yaml
+```
 
 #### Define Steady State
 Before we begin a failure experiment, we need to validate the user experience and revise the dashboard and metrics to understand that the systems are working under normal state, in other words, steady state.
