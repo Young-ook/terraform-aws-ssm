@@ -153,6 +153,22 @@ module "eks" {
   ]
 }
 
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.helmconfig.host
+    token                  = module.eks.helmconfig.token
+    cluster_ca_certificate = base64decode(module.eks.helmconfig.ca)
+  }
+}
+
+module "container-insights" {
+  source       = "Young-ook/eks/aws//modules/container-insights"
+  enabled      = true
+  cluster_name = module.eks.cluster.name
+  oidc         = module.eks.oidc
+  tags         = var.tags
+}
+
 ### application/monitoring
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name                = local.cw_cpu_alarm_name
