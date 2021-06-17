@@ -142,9 +142,15 @@ module "eks" {
   subnets            = values(module.vpc.subnets["private"])
   kubernetes_version = "1.19"
   enable_ssm         = true
+  fargate_profiles = [
+    {
+      name      = "loadtest"
+      namespace = "loadtest"
+    },
+  ]
   managed_node_groups = [
     {
-      name          = "default"
+      name          = "sockshop"
       min_size      = 1
       max_size      = 3
       desired_size  = 3

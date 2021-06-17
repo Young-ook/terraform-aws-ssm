@@ -165,7 +165,6 @@ For this lab, we picked up the Sock Shop application. Sock Shop is a microservic
 
 Create the namespace and deploy application.
 ```
-$ kubectl create namespace sock-shop
 $ kubectl apply -f manifests/sockshop-complete-demo.yaml
 ```
 Verify that the pod came up fine (ensure nothing else is running on port 8079):
