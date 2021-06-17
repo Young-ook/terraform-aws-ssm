@@ -21,19 +21,19 @@ To implement Chaos Engineering, one should follow the scientific method to imple
 
 Run terraform:
 ```
-$ terraform init
-$ terraform apply
+terraform init
+terraform apply
 ```
 Also you can use the `-var-file` option for customized paramters when you run the terraform plan/apply command.
 ```
-$ terraform plan -var-file tc1.tfvars
-$ terraform apply -var-file tc1.tfvars
+terraform plan -var-file tc1.tfvars
+terraform apply -var-file tc1.tfvars
 ```
 
 ## Create Experiment Templates
 Run script
 ```
-$ ./fis-create-experiment-templates.sh
+./fis-create-experiment-templates.sh
 ```
 This script creates fault injection simulator experiment templates on the AWS account. Move to the AWS FIS service page on the AWS Management Conosol and select Experiment templates menu on the left. Then users will see the created experiment templates for chaos engineering.
 
@@ -156,8 +156,8 @@ AWS FIS allows you to test resilience of EKS cluster node groups. See what happe
 #### Update kubeconfig
 Update and download kubernetes config file to local. You can see the bash command like below after terraform apply is complete. Copy this and run it to save the kubernetes configuration file to your local workspace. And export it as an environment variable to apply to the terminal.
 ```
-$ bash -e .terraform/modules/eks/script/update-kubeconfig.sh -r ap-northeast-2 -n ssm-fis -k kubeconfig
-$ export KUBECONFIG=kubeconfig
+bash -e .terraform/modules/eks/script/update-kubeconfig.sh -r ap-northeast-2 -n ssm-fis -k kubeconfig
+export KUBECONFIG=kubeconfig
 ```
 
 #### Microservices Architecture Application
@@ -165,11 +165,11 @@ For this lab, we picked up the Sock Shop application. Sock Shop is a microservic
 
 Create the namespace and deploy application.
 ```
-$ kubectl apply -f manifests/sockshop-complete-demo.yaml
+kubectl apply -f manifests/sockshop-complete-demo.yaml
 ```
 Verify that the pod came up fine (ensure nothing else is running on port 8079):
 ```
-$ kubectl -n sock-shop get pod -l name=front-end
+kubectl -n sock-shop get pod -l name=front-end
 ```
 The output will be something like this:
 ```
@@ -180,14 +180,14 @@ front-end-7b8bcd59cb-wd527   1/1     Running   0          9s
 ##### Local Workspace
 In your local workspace, connect through a proxy to access your application's endpoint.
 ```
-$ kubectl -n sock-shop port-forward svc/front-end 8080:80
+kubectl -n sock-shop port-forward svc/front-end 8080:80
 ```
 Open `http://localhost:8080` on your web browser. This shows the Sock Shop main page.
 
 ##### Cloud9
 In your Cloud9 IDE, run the application.
 ```
-$ kubectl -n sock-shop port-forward svc/front-end 8080:80
+kubectl -n sock-shop port-forward svc/front-end 8080:80
 ```
 Click `Preview` and `Preview Running Application`. This opens up a preview tab and shows the Sock Shop main page.
 
@@ -198,7 +198,7 @@ Click `Preview` and `Preview Running Application`. This opens up a preview tab a
 #### Run Load Generator
 Run load generator inside kubernetes
 ```
-$ kubectl apply -f manifests/sockshop-loadtest.yaml
+kubectl apply -f manifests/sockshop-loadtest.yaml
 ```
 
 #### Define Steady State
@@ -208,8 +208,8 @@ Before we begin a failure experiment, we need to validate the user experience an
 
 Let’s go ahead and explore Sock Shop application. Some things to try out:
 1. Register and log in using the below credentials (These are very secure so please don’t share them)
-  * Username: `user`
-  * Password: `password`
+    * Username: `user`
+    * Password: `password`
 1. View various items
 1. Add items to cart
 1. Remove items from cart
@@ -226,15 +226,15 @@ Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of e
 ### Delete experiment templates
 Run script
 ```
-$ ./fis-delete-experiment-templates.sh
+./fis-delete-experiment-templates.sh
 ```
 
 ### Delete infrastructure
 Run terraform:
 ```
-$ terraform destroy
+terraform destroy
 ```
 Don't forget you have to use the `-var-file` option when you run terraform destroy command to delete the aws resources created with extra variable files.
 ```
-$ terraform destroy -var-file tc1.tfvars
+terraform destroy -var-file tc1.tfvars
 ```
