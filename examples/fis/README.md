@@ -222,6 +222,36 @@ Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of e
 
 ![aws-fis-terminate-eks-nodes-action-complete](../../images/aws-fis-terminate-eks-nodes-action-complete.png)
 
+#### Architecture Improvements
+Copy the code below and add it behind the *container-insights* module in the `main.tf` file.
+```
+module "cluster-autoscaler" {
+  source       = "Young-ook/eks/aws//modules/cluster-autoscaler"
+  cluster_name = module.eks.cluster.name
+  oidc         = module.eks.oidc
+}
+```
+Run terraform apply to install Cluster Autoscaler on your EKS cluster.
+```
+terraform apply --auto-approve
+```
+Scale out pods for high availability.
+```
+kubectl -n sockshop scale --replicas=3 \
+  deployment/front-end deployment/carts deployment/catalogue \
+  deployment/orders deployment/payment deployment/shipping \
+  deployment/user
+```
+
+#### Rerun Experiment
+
+#### Remove Application
+Delete all kubernetes resources.
+```
+kubectl apply -f manifests/sockshop-complete-demo.yaml
+kubectl apply -f manifests/sockshop-loadtest.yaml
+```
+
 ## Clean up
 ### Delete experiment templates
 Run script

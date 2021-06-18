@@ -152,7 +152,7 @@ module "eks" {
     {
       name          = "sockshop"
       min_size      = 1
-      max_size      = 3
+      max_size      = 5
       desired_size  = 3
       instance_type = "t3.small"
     }
@@ -169,11 +169,11 @@ provider "helm" {
 
 module "container-insights" {
   source       = "Young-ook/eks/aws//modules/container-insights"
-  enabled      = true
   cluster_name = module.eks.cluster.name
   oidc         = module.eks.oidc
-  tags         = var.tags
 }
+
+# TODO : copy the cluster-autoscaler module here
 
 ### application/monitoring
 resource "aws_cloudwatch_metric_alarm" "cpu" {
