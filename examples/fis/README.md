@@ -216,11 +216,41 @@ Let’s go ahead and explore Sock Shop application. Some things to try out:
 1. Check out items
 
 #### Run Experiment
-Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS shuts down EKS nodes for up to 70% of currently running instances. In this experiment, this value is 20% and it is configured in the experiment template. You can edit this value in the target selection mode configuration if you want to change the number of EKS nodes to shut down You can see the terminated instances on the EC2 service page, and the new instances will appear shortly after the EKS node is shut down.
+Go to the AWS FIS service page and select `TerminateEKSNodes` from the list of experiment templates. Then use the on-screen `Actions` button to start the experiment. AWS FIS shuts down EKS nodes for up to 70% of currently running instances. In this experiment, this value is 30% and it is configured in the experiment template. You can edit this value in the target selection mode configuration if you want to change the number of EKS nodes to shut down You can see the terminated instances on the EC2 service page, and the new instances will appear shortly after the EKS node is shut down.
 
 ![aws-fis-terminate-eks-nodes](../../images/aws-fis-terminate-eks-nodes.png)
 
 ![aws-fis-terminate-eks-nodes-action-complete](../../images/aws-fis-terminate-eks-nodes-action-complete.png)
+
+#### Architecture Improvements
+Copy the code below and add it behind the *container-insights* module in the `main.tf` file.
+```
+module "cluster-autoscaler" {
+  source       = "Young-ook/eks/aws//modules/cluster-autoscaler"
+  cluster_name = module.eks.cluster.name
+  oidc         = module.eks.oidc
+}
+```
+Run terraform apply to install Cluster Autoscaler on your EKS cluster.
+```
+terraform apply --auto-approve
+```
+Scale out pods for high availability.
+```
+kubectl -n sockshop scale --replicas=3 \
+  deployment/front-end deployment/carts deployment/catalogue \
+  deployment/orders deployment/payment deployment/shipping \
+  deployment/user
+```
+
+#### Rerun Experiment
+
+#### Remove Application
+Delete all kubernetes resources.
+```
+kubectl apply -f manifests/sockshop-complete-demo.yaml
+kubectl apply -f manifests/sockshop-loadtest.yaml
+```
 
 ## Clean up
 ### Delete experiment templates
