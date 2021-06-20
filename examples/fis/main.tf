@@ -123,15 +123,39 @@ module "ec2" {
   node_groups = [
     {
       name              = "web"
-      min_size          = 1
-      max_size          = 3
-      desired_size      = 3
+      min_size          = 2
+      max_size          = 6
+      desired_size      = 2
       instance_type     = "t3.small"
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+    },
+    {
+      name              = "loadgen"
+      min_size          = 1
+      max_size          = 1
+      desired_size      = 1
+      instance_type     = "t3.small"
+      security_groups   = [aws_security_group.alb_aware.id]
+      target_group_arns = [aws_lb_target_group.http.arn]
+      user_data         = local.vclient
     }
   ]
+}
+
+resource "aws_autoscaling_policy" "target-tracking" {
+  name                   = local.asg_target_tracking_policy_name
+  autoscaling_group_name = module.ec2.asg.web.name
+  adjustment_type        = "ChangeInCapacity"
+
+  policy_type = "TargetTrackingScaling"
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 10.0
+  }
 }
 
 ### application/eks
@@ -173,7 +197,7 @@ module "container-insights" {
   oidc         = module.eks.oidc
 }
 
-# TODO : copy the cluster-autoscaler module here
+# TODO : copy the cluster-autoscaler module code here
 
 ### application/monitoring
 resource "aws_cloudwatch_metric_alarm" "cpu" {
@@ -181,12 +205,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_description         = "This metric monitors ec2 cpu utilization"
   tags                      = merge(local.default-tags, var.tags)
   comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = 2
+  evaluation_periods        = 3
   metric_name               = "CPUUtilization"
   namespace                 = "AWS/EC2"
   period                    = 60
   statistic                 = "Average"
-  threshold                 = 40
+  threshold                 = 60
   insufficient_data_actions = []
 
   dimensions = {

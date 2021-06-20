@@ -24,9 +24,9 @@
             "actionId": "aws:ssm:send-command",
             "description": "run cpu stress using ssm",
             "parameters": {
-                "duration": "PT2M",
+                "duration": "PT10M",
                 "documentArn": "arn:aws:ssm:${region}::document/AWSFIS-Run-CPU-Stress",
-                "documentParameters": "{\"DurationSeconds\": \"120\", \"InstallDependencies\": \"True\", \"CPU\": \"0\"}"
+                "documentParameters": "{\"DurationSeconds\": \"600\", \"InstallDependencies\": \"True\", \"CPU\": \"0\"}"
             },
             "targets": {
                 "Instances": "ec2-instances"
