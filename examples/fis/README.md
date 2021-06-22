@@ -79,7 +79,7 @@ To test stop condition with cloudwatch alarm, we have to replace the stop condit
 1. Select `experiment templates` on the navigation bar.
 1. Find out `NetworkLatency` template from the list and select.
 1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
-1. Scroll down to the bottom of edit page. And update the stop condition alarm to `blah-xxxx-p90-alarm` and save.
+1. Scroll down to the bottom of edit page. And update the stop condition alarm to `blahblah-p90-alarm` and save.
 
 ![aws-fis-stop-condition-update-p90](../../images/aws-fis-stop-condition-update-p90.png)
 
@@ -108,15 +108,23 @@ After the emergency button test, A new experiment can be started to prove the hy
 Increase the capacity of the ec2 autoscaling group to distribute requests from the load balancer. This will help reduce p90 latency by distributing the load when aws fis creates network latency situations for the target.
 
 1. Go to the Amazon EC2 service page.
-1. Select `Autoscaling group` on the bottom of navigation bar.
+1. Select `Autoscaling group` on the bottom of left hand navigation bar.
 1. On the Auto Scaling groups page, select the check box next to the Auto Scaling group whose settings you want to manage. The name is something like this `ssm-fis-xxxx`. A split pane opens up in the bottom part of the Auto Scaling groups page, showing information about the group that's selected.
 1. In the lower pane, in the Details tab, view or change the current settings for minimum, maximum, and desired capacity.
-1. Update the desired capacity to 9.
+1. Update the desired and maximum capacity to 9.
 
 #### Rerun Experiment
 Back to the AWS FIS service page, and rerun the network latency experiment against the updated target to ensure that the API response is in the previously assumed steady state. In this case, the p90 delay alarm is not triggered. That is, 90% of the data points for latency are faster than the threshold. Therefore this experiment will be completed normaly.
 
 ![aws-fis-ec2-network-latency-action-complete](../../images/aws-fis-ec2-network-latency-action-complete.png)
+
+#### Clean up
+Restore desired capacity of the autoscaling group for next step.
+
+1. Go to the Amazon EC2 service page.
+1. Select `Autoscaling group` on the bottom of left hand navigation bar.
+1. On the Auto Scaling groups page, select the Auto Scaling group you want to adjust.
+1. Restore maximum and desired capacity. Set the desired capacity to 2 and the maximum capacity to 6. Save.
 
 ### CPU Stress
 When you successfully start the CPU stress experiment, the CPU utilization of some target instances increases. You can view this metric on the Monitoring tab displayed when the user selects an ec2 instance, or on the CloudWatch service page.
@@ -124,10 +132,20 @@ When you successfully start the CPU stress experiment, the CPU utilization of so
 #### Define Steady State
 Before we begin creating failures, a starting point would be to understand the steady state of your application. This includes validating the user experience and revising your dashboard and metrics to understand your systems are operating under normal conditions. Check the monitoring metrics and alarms for API response and CPU utilization on the AWS cloudwatch. If everything looks fine, you can start from there.
 
+##### Update Alarm Source
+For this CPU stress experiment, we need to roll back the alarm configuration to its previous state. This alert means that the application's CPU usage is very high and the application is slow.
+
+1. Move on the FIS service page.
+1. Select `experiment templates` on the navigation bar.
+1. Find out `CPUStress` template from the list and select.
+1. Click `Actions` button and select `Update experiment template` menu to update the template configuration.
+1. Scroll down to the bottom of edit page. And update the stop condition alarm to `blahblah-cpu-alarm` and save.
+
 #### Run Experiment
-#### Architecture Improvements
-##### Configure Autoscaling Policy
-#### Rerun Experiment
+Run `CPUStress` experiment. Let's see the target tracking policyfor EC2 autoscaling group is working well. With target tracking scaling policies, you select a scaling metric and set a target value. EC2 Auto Scaling creates and manages the CloudWatch alarms that trigger the scaling policy and calculates the scaling adjustment based on the metric and the target value. The scaling policy adds or removes capacity as required to keep the metric at, or close to, the specified target value. In addition to keeping the metric close to the target value, a target tracking scaling policy also adjusts to changes in the metric due to a changing load pattern.
+
+#### Comparative experiment
+Remove the target tracking policy from the EC2 Autoscaling group to test what happens when there is a spike in CPU usage. The average value of CPU utilization will continue to increase. Probably because there is no policy to add more server resources to spread the workload. To test the hypothesis defined in the previous step, we reuse the AWS FIS experiment to inject a CPU stress situation.
 
 ### Terminate EC2 Instances
 AWS FIS allows you to test resilience based on ec2 autoscaling group. See what happens when you terminate some ec2 instances in a specific availability zone. This test will check if the autoscaling group launches new instances to meet the desired capacity defined. Use this test to verify that the autoscaling group overcomes the single availability zone failure.
@@ -244,6 +262,7 @@ kubectl -n sockshop scale --replicas=3 \
 ```
 
 #### Rerun Experiment
+Back to the AWS FIS service page, and rerun the terminate eks nodes experiment against the target to ensure that the microservices application is working in the previously assumed steady state.
 
 #### Remove Application
 Delete all kubernetes resources.
