@@ -43,7 +43,7 @@ This script creates fault injection simulator experiment templates on the AWS ac
 To test your environment, select a experiment template that you want to run and click the `Actions` button on the right top on the screen. You will see `Start experiment` in the middle of poped up menu and select it. And follow the instructions.
 
 ### Run Load Generator
-Enter an ec2 instance via session manager and run virtual client script runs loop action for http requests on the target application load balancer. You will find out the example script for virtual client load generater on the terraform outputs after terraform apply command is complete. It looks like below.
+Terraform configuration also creates a load generator autoscaling group for your application instances. When running, this load generator instance runs a virtual client script that repeatedly sends http requests to the application load balancer. After running the terraform apply command, you can find the details of the script in the terraform output. It should look similar to the example below.
 ```
 #!/bin/bash
 while true; do
