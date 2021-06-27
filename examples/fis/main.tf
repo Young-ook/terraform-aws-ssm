@@ -122,10 +122,20 @@ module "ec2" {
   subnets = values(module.vpc.subnets["private"])
   node_groups = [
     {
-      name              = "web"
+      name              = "baseline"
       min_size          = 2
       max_size          = 6
       desired_size      = 2
+      instance_type     = "t3.small"
+      security_groups   = [aws_security_group.alb_aware.id]
+      target_group_arns = [aws_lb_target_group.http.arn]
+      user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+    },
+    {
+      name              = "canary"
+      min_size          = 1
+      max_size          = 1
+      desired_size      = 1
       instance_type     = "t3.small"
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
@@ -146,7 +156,7 @@ module "ec2" {
 
 resource "aws_autoscaling_policy" "target-tracking" {
   name                   = local.asg_target_tracking_policy_name
-  autoscaling_group_name = module.ec2.asg.web.name
+  autoscaling_group_name = module.ec2.asg.baseline.name
   adjustment_type        = "ChangeInCapacity"
 
   policy_type = "TargetTrackingScaling"
@@ -214,7 +224,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   insufficient_data_actions = []
 
   dimensions = {
-    AutoScalingGroupName = module.ec2.asg.web.name
+    AutoScalingGroupName = module.ec2.asg.baseline.name
   }
 }
 
