@@ -129,6 +129,7 @@ module "ec2" {
       instance_type     = "t3.small"
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
+      tags              = { release = "baseline" }
       user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
     },
     {
@@ -139,6 +140,7 @@ module "ec2" {
       instance_type     = "t3.small"
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
+      tags              = { release = "canary" }
       user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
     },
     {

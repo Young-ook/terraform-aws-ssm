@@ -60,7 +60,7 @@ data "aws_ami" "al2" {
 resource "aws_launch_template" "asg" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   name          = join("-", [local.name, each.key])
-  tags          = merge(local.default-tags, var.tags)
+  tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
   image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
   user_data     = base64encode(lookup(each.value, "user_data", ""))
   instance_type = lookup(each.value, "instance_type", "t3.medium")
@@ -86,7 +86,7 @@ resource "aws_launch_template" "asg" {
 
   tag_specifications {
     resource_type = "instance"
-    tags          = merge(local.default-tags, var.tags)
+    tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
   }
 
   lifecycle {
@@ -150,7 +150,8 @@ resource "aws_autoscaling_group" "asg" {
     for_each = merge(
       { "Name" = join("-", [local.name, each.key]) },
       local.default-tags,
-      var.tags
+      var.tags,
+      lookup(each.value, "tags", {})
     )
     content {
       key                 = tag.key
