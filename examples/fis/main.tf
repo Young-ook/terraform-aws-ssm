@@ -170,47 +170,6 @@ resource "aws_autoscaling_policy" "target-tracking" {
   }
 }
 
-### application/eks
-module "eks" {
-  source             = "Young-ook/eks/aws"
-  name               = var.name
-  tags               = var.tags
-  subnets            = values(module.vpc.subnets["private"])
-  kubernetes_version = "1.19"
-  enable_ssm         = true
-  fargate_profiles = [
-    {
-      name      = "loadtest"
-      namespace = "loadtest"
-    },
-  ]
-  managed_node_groups = [
-    {
-      name          = "sockshop"
-      min_size      = 1
-      max_size      = 5
-      desired_size  = 3
-      instance_type = "t3.small"
-    }
-  ]
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.helmconfig.host
-    token                  = module.eks.helmconfig.token
-    cluster_ca_certificate = base64decode(module.eks.helmconfig.ca)
-  }
-}
-
-module "container-insights" {
-  source       = "Young-ook/eks/aws//modules/container-insights"
-  cluster_name = module.eks.cluster.name
-  oidc         = module.eks.oidc
-}
-
-# TODO : copy the cluster-autoscaler module code here
-
 ### application/monitoring
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name                = local.cw_cpu_alarm_name
