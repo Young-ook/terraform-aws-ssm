@@ -14,8 +14,3 @@ output "vclient" {
   description = "Script to call APIs as a virtual client"
   value       = local.vclient
 }
-
-output "kubeconfig" {
-  description = "Bash script to update kubeconfig file"
-  value       = module.eks.kubeconfig
-}
