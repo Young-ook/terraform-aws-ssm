@@ -30,12 +30,8 @@ terraform plan -var-file tc1.tfvars
 terraform apply -var-file tc1.tfvars
 ```
 
-## Create Experiment Templates
-Run script
-```
-./fis-create-experiment-templates.sh
-```
-This script creates fault injection simulator experiment templates on the AWS account. Move to the AWS FIS service page on the AWS Management Conosol and select Experiment templates menu on the left. Then users will see the created experiment templates for chaos engineering.
+## Experiment Templates
+This module creates fault injection simulator experiment templates when creating. Move to the AWS FIS service page on the AWS Management Conosol and select Experiment templates menu on the left. Then users will see the created experiment templates for chaos engineering.
 
 ![aws-fis-experiment-templates](../../images/aws-fis-experiment-templates.png)
 
@@ -169,13 +165,6 @@ Following screenshot shows how it works. First line shows the request and repons
 ![aws-fis-throttling-ec2-api](../../images/aws-fis-throttling-ec2-api.png)
 
 ## Clean up
-### Delete experiment templates
-Run script
-```
-./fis-delete-experiment-templates.sh
-```
-
-### Delete infrastructure
 Run terraform:
 ```
 terraform destroy
