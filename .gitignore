@@ -4,6 +4,8 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+**/.terraform.tfstate.lock.info
+**/.terraform.lock.hcl
 
 # User kubernetes cluster configs
 kubeconfig
