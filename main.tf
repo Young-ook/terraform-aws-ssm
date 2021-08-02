@@ -5,6 +5,12 @@ module "current" {
   version = ">= 2.0"
 }
 
+## features
+locals {
+  node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
+  warm_pools_enabled  = (var.warm_pools != null ? ((length(var.warm_pools) > 0) ? true : false) : false)
+}
+
 ## autoscaling groups (asg)
 # security/policy
 resource "aws_iam_role" "asg" {
@@ -38,7 +44,7 @@ resource "aws_iam_instance_profile" "asg" {
 }
 
 ## amazon-linux 2
-data "aws_ami" "al2" {
+data "aws_ami" "ng" {
   for_each    = { for ng in var.node_groups : ng.name => ng }
   owners      = ["amazon"]
   most_recent = true
@@ -57,11 +63,11 @@ data "aws_ami" "al2" {
   }
 }
 
-resource "aws_launch_template" "asg" {
+resource "aws_launch_template" "ng" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   name          = join("-", [local.name, each.key])
   tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
-  image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
+  image_id      = lookup(each.value, "image_id", data.aws_ami.ng[each.key].id)
   user_data     = base64encode(lookup(each.value, "user_data", ""))
   instance_type = lookup(each.value, "instance_type", "t3.medium")
   key_name      = lookup(each.value, "key_name", null)
@@ -95,7 +101,7 @@ resource "aws_launch_template" "asg" {
   }
 }
 
-resource "aws_autoscaling_group" "asg" {
+resource "aws_autoscaling_group" "ng" {
   for_each              = { for ng in var.node_groups : ng.name => ng }
   name                  = join("-", [local.name, each.key])
   vpc_zone_identifier   = local.subnet_ids
@@ -107,21 +113,15 @@ resource "aws_autoscaling_group" "asg" {
   protect_from_scale_in = false
   termination_policies  = ["Default"]
   enabled_metrics = [
-    "GroupMinSize",
-    "GroupMaxSize",
-    "GroupDesiredCapacity",
-    "GroupInServiceInstances",
-    "GroupPendingInstances",
-    "GroupStandbyInstances",
-    "GroupTerminatingInstances",
-    "GroupTotalInstances",
+    "GroupPendingInstances", "GroupStandbyInstances", "GroupInServiceInstances", "GroupMinSize",
+    "GroupTerminatingInstances", "GroupDesiredCapacity", "GroupTotalInstances", "GroupMaxSize",
   ]
 
   mixed_instances_policy {
     launch_template {
       launch_template_specification {
-        launch_template_id = aws_launch_template.asg[each.key].id
-        version            = aws_launch_template.asg[each.key].latest_version
+        launch_template_id = aws_launch_template.ng[each.key].id
+        version            = aws_launch_template.ng[each.key].latest_version
       }
 
       dynamic "override" {
@@ -166,7 +166,115 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   depends_on = [
-    aws_iam_role.asg,
-    aws_launch_template.asg,
+    aws_launch_template.ng,
+  ]
+}
+
+## amazon-linux 2
+data "aws_ami" "wp" {
+  for_each    = { for wp in var.warm_pools : wp.name => wp }
+  owners      = ["amazon"]
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = [format("amzn2-ami-hvm-*")]
+  }
+  filter {
+    name   = "block-device-mapping.volume-type"
+    values = [lookup(each.value, "volume_type", "gp2")]
+  }
+  filter {
+    name   = "architecture"
+    values = [lookup(each.value, "arch", "x86_64")]
+  }
+}
+
+resource "aws_launch_template" "wp" {
+  for_each      = { for wp in var.warm_pools : wp.name => wp }
+  name          = join("-", [local.name, each.key])
+  tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
+  image_id      = lookup(each.value, "image_id", data.aws_ami.wp[each.key].id)
+  user_data     = base64encode(lookup(each.value, "user_data", ""))
+  instance_type = lookup(each.value, "instance_type", "t3.medium")
+  key_name      = lookup(each.value, "key_name", null)
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.asg.arn
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size           = lookup(each.value, "disk_size", "20")
+      volume_type           = lookup(each.value, "volume_type", "gp2")
+      delete_on_termination = true
+    }
+  }
+
+  network_interfaces {
+    security_groups       = lookup(each.value, "security_groups", [])
+    delete_on_termination = true
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [name]
+  }
+}
+
+resource "aws_autoscaling_group" "wp" {
+  for_each              = { for wp in var.warm_pools : wp.name => wp }
+  name                  = join("-", [local.name, each.key])
+  vpc_zone_identifier   = local.subnet_ids
+  max_size              = lookup(each.value, "max_size", 3)
+  min_size              = lookup(each.value, "min_size", 1)
+  desired_capacity      = lookup(each.value, "desired_size", 1)
+  target_group_arns     = lookup(each.value, "target_group_arns", null)
+  force_delete          = true
+  protect_from_scale_in = false
+  termination_policies  = ["Default"]
+  enabled_metrics = [
+    "GroupPendingInstances", "GroupStandbyInstances", "GroupInServiceInstances", "GroupMinSize",
+    "GroupTerminatingInstances", "GroupDesiredCapacity", "GroupTotalInstances", "GroupMaxSize",
+  ]
+
+  launch_template {
+    id      = aws_launch_template.wp[each.key].id
+    version = aws_launch_template.wp[each.key].latest_version
+  }
+
+  warm_pool {
+    pool_state                  = lookup(each.value, "pool_state", "Stopped")
+    min_size                    = lookup(each.value, "min_pool_size", 0)
+    max_group_prepared_capacity = lookup(each.value, "max_group_prepared_capacity", 0)
+  }
+
+  dynamic "tag" {
+    for_each = merge(
+      { "Name" = join("-", [local.name, each.key]) },
+      local.default-tags,
+      var.tags,
+      lookup(each.value, "tags", {})
+    )
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [desired_capacity, name]
+  }
+
+  depends_on = [
+    aws_launch_template.wp,
   ]
 }

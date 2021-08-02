@@ -1,4 +1,4 @@
-name = "ssm-tc2-isolated"
+name = "ssm-bastion-tc2-isolated"
 tags = {
   env  = "dev"
   test = "tc2"
