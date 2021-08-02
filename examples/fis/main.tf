@@ -158,7 +158,7 @@ module "ec2" {
 
 resource "aws_autoscaling_policy" "target-tracking" {
   name                   = local.asg_target_tracking_policy_name
-  autoscaling_group_name = module.ec2.asg.baseline.name
+  autoscaling_group_name = module.ec2.cluster.data_plane.node_groups.baseline.name
   adjustment_type        = "ChangeInCapacity"
 
   policy_type = "TargetTrackingScaling"
@@ -185,7 +185,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   insufficient_data_actions = []
 
   dimensions = {
-    AutoScalingGroupName = module.ec2.asg.baseline.name
+    AutoScalingGroupName = module.ec2.cluster.data_plane.node_groups.baseline.name
   }
 }
 

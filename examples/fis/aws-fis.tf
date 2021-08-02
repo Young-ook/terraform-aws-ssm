@@ -28,12 +28,13 @@ resource "aws_iam_role_policy_attachment" "fis-run" {
 locals {
   target_vpc           = module.vpc.vpc.id
   target_role          = module.ec2.role.arn
+  target_ec2           = module.ec2.cluster.data_plane.node_groups.baseline.name
   stop_condition_alarm = aws_cloudwatch_metric_alarm.cpu.arn
 }
 
 resource "local_file" "cpu-stress" {
   content = templatefile("${path.module}/templates/cpu-stress.tpl", {
-    asg    = module.ec2.asg.baseline.name
+    asg    = local.target_ec2
     region = var.aws_region
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
@@ -44,7 +45,7 @@ resource "local_file" "cpu-stress" {
 
 resource "local_file" "network-latency" {
   content = templatefile("${path.module}/templates/network-latency.tpl", {
-    asg    = module.ec2.asg.baseline.name
+    asg    = local.target_ec2
     region = var.aws_region
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
@@ -60,7 +61,7 @@ resource "random_integer" "az" {
 
 resource "local_file" "terminate-instances" {
   content = templatefile("${path.module}/templates/terminate-instances.tpl", {
-    asg   = module.ec2.asg.baseline.name
+    asg   = local.target_ec2
     az    = var.azs[random_integer.az.result]
     vpc   = local.target_vpc
     alarm = local.stop_condition_alarm
