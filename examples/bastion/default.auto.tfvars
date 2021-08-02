@@ -9,7 +9,7 @@ enable_igw = false
 enable_ngw = false
 node_groups = [
   {
-    name          = "bastion"
+    name          = "default"
     desired_size  = 1
     instance_type = "t3.small"
   }
