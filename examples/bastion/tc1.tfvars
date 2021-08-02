@@ -1,4 +1,4 @@
-name = "ssm-tc1-private"
+name = "ssm-bastion-tc1-private"
 tags = {
   env  = "dev"
   test = "tc1"

@@ -1,7 +1,6 @@
-name = "ssm-bastion-tc3-ami"
+name = "ssm-bastion"
 tags = {
   env  = "dev"
-  test = "tc3"
 }
 aws_region = "ap-northeast-2"
 azs        = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
@@ -10,11 +9,8 @@ enable_igw = false
 enable_ngw = false
 node_groups = [
   {
-    name          = "default"
-    min_size      = 1
-    max_size      = 1
+    name          = "bastion"
     desired_size  = 1
     instance_type = "t3.small"
-    image_id      = "ami-04a18ed8b7b44aced" # Windows Server 2019 English Full Base (ap-northeast-2)
   }
 ]
