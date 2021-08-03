@@ -8,18 +8,53 @@ git clone https://github.com/Young-ook/terraform-aws-ssm
 cd terraform-aws-ssm/examples/warm-pools
 ```
 
+## Prerequiesites
+This module creates a script to display warm pools activities. This script uses a couple open source tools to parse the JSON response from a `DescribeScalingActivities` API call. Ensure you have [jq](https://stedolan.github.io/jq/download/) and [dateutils](http://www.fresse.org/dateutils/) installed in your environment.
+
+### macOS
+```sh
+brew install jq dateutils
+```
+
 ## Setup
 [This](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf) is the example of terraform configuration file to create an EC2 instance which is managed by Systems Manager on your AWS account. Check out and apply it using terraform command.
 
 Run terraform:
-```
+```sh
 terraform init
 terraform apply
 ```
 Also you can use the `-var-file` option for customized paramters when you run the terraform plan/apply command.
-```
+```sh
 terraform plan -var-file tc1.tfvars
 terraform apply -var-file tc1.tfvars
+```
+
+## Verify
+After terraform apply, you will see an instance in the warm pools. That instance will be launched to run the user-data script for application initialization when it is registered with the warm-pool. After initialization, the instance state changes to 'Stopped' for waiting.
+
+To check the elpased time to initial configuration of the instance, run this script:
+```sh
+bash elapsedtime.sh
+```
+The output of this command shows the duration of the instance launch.
+```sh
+Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
+```
+
+### Launch a new instance from warm pool
+Modify the `desired_capacity` value of `warm_pools` map in [main.tf](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf) file to scale out the current autoscaling group. After terraform configuration file update, run again terraform apply.
+```sh
+terraform apply
+```
+The output of the change plan will be displayed. Check it, and enter *yes* to confirm. After a few minutes, run the script below to see the history of Autoscaling group activity and the elapsed time of each operation.
+```sh
+bash elapsedtime.sh
+```
+The output of this command shows the duration of the instance launch.
+```sh
+Launching a new EC2 instance from warm pool: i-0180961b460339ed3 Duration: 19s
+Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
 
 ## Connect
