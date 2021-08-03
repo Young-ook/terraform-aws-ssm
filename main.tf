@@ -162,7 +162,7 @@ resource "aws_autoscaling_group" "ng" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [desired_capacity, name]
+    ignore_changes        = [name]
   }
 
   depends_on = [
@@ -271,7 +271,7 @@ resource "aws_autoscaling_group" "wp" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [desired_capacity, name]
+    ignore_changes        = [name]
   }
 
   depends_on = [
