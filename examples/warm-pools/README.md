@@ -33,6 +33,8 @@ terraform apply -var-file tc1.tfvars
 ## Verify
 After terraform apply, you will see an instance in the warm pools. That instance will be launched to run the user-data script for application initialization when it is registered with the warm-pool. After initialization, the instance state changes to 'Stopped' for waiting.
 
+![aws-asg-wp-stopped](../../images/aws-asg-wp-stopped.png)
+
 To check the elpased time to initial configuration of the instance, run this script:
 ```sh
 bash elapsedtime.sh
@@ -56,6 +58,8 @@ The output of this command shows the duration of the instance launch.
 Launching a new EC2 instance from warm pool: i-0180961b460339ed3 Duration: 19s
 Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
+
+![aws-asg-activity-history](../../images/aws-asg-activity-history.png)
 
 ## Connect
 Move to the EC2 service page on the AWS Management Conosol and select Instances button on the left side menu. Find an instance that you launched. Select the instance and click 'Connect' button on top of the window. After then you will see three tabs EC2 Instance Connect, Session Manager, SSH client. Select Session Manager tab and follow the instruction on the screen.
