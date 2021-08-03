@@ -1,3 +1,5 @@
+[[English](README.md)] [[한국어](README.ko.md)]
+
 # EC2 Auto Scaling Warm Pools
 A warm pool is a pool of pre-initialized EC2 instances that sits alongside the Auto Scaling group. Whenever your application needs to scale out, the Auto Scaling group can draw on the warm pool to meet its new desired capacity. A warm pool gives you the ability to decrease latency for your applications that have exceptionally long boot times, for example, because instances need to write massive amounts of data to disk. With warm pools, you no longer have to over-provision your Auto Scaling groups to manage latency in order to improve application performance. For more information and example configurations, see [Warm pools for Amazon EC2 Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-warm-pools.html) in the Amazon EC2 Auto Scaling User Guide.
 
@@ -45,7 +47,7 @@ Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
 
 ### Launch a new instance from warm pool
-Modify the `desired_capacity` value of `warm_pools` map in [main.tf](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf) file to scale out the current autoscaling group. After terraform configuration file update, run again terraform apply.
+Modify the `desired_capacity` value of `warm_pools` map in [main.tf](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf) file to 1 to scale out the current autoscaling group. After terraform configuration file update, run again terraform apply.
 ```sh
 terraform apply
 ```
