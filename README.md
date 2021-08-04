@@ -6,7 +6,7 @@
 - [Bastion host using EIP for allowlist firewall](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/eip)
 - [AWS Fault Injection Simulator with AWS Systems Manager](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/fis)
 - [AWS Fault Injection Simulator with Amazon Elastic Kubernetes Service](https://github.com/Young-ook/terraform-aws-eks/blob/main/examples/fis)
-- [EC2 Autoscaling Warm Pools](https://github.com/Young-ook/terraform-aws-eks/blob/main/examples/warm-pools)
+- [EC2 Autoscaling Warm Pools](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools)
 
 ## Getting started
 ### AWS CLI
