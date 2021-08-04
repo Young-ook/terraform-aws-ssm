@@ -3,6 +3,13 @@
 # EC2 오토스케일링 그룹 웜풀
 웜풀(Warm Pool)은 미리 초기화된 EC2 인스턴스들을 오토스케일링 그룹(Auto Sacling Group)에 함께 보관해두는 기능입니다. 여러 분의 어플리케이션이 수평 확장을 수행할 때 오토스케일링 그룹은 풀에서 인스턴스를 가져와서 사용할 수 있습니다. 웜풀은 사용자의 어플리케이션이 준비 시간이 특히 오래 걸리는 경우, 특히 인스턴스가 엄청난 양의 데이터를 디스크로부터 읽어야 하는 경우에 인스턴스가 서비스에 투입되는 시간을 줄여 줄 수 있습니다. 웜풀을 사용한다면, 빠른 대응을 위해 필요 이상으로 인스턴스를 생성해야할 필요가 없습니다. 보다 자세한 내용은 아마존 EC2 오토스케일링 사용자 안내서의, [EC2 오토스케일링 그룹 웜풀](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-warm-pools.html)을 참조하시기 바랍니다.
 
+## 웜풀 인스턴스 생명주기
+웜풀의 인스턴스들은 각각의 생명주기 상태변화에 맞는 행동을 정의하기 위한 독립접인 생명주기를 가집니다. 이 생명주기는 인스턴스 시작시점부터 종료까지 달라지는 상태를 거쳐갑니다. 이러한 상태변화 과정 사이에 생명주기 훅(Hook)을 만들어서 특정 순간에 해야할 작업을 지정할 수 있습니다.
+
+아래 그림은 각 상태변화를 표시한 것입니다:
+
+![aws-asg-wp-lifecycle](../../images/aws-asg-wp-lifecycle.png)
+
 ## 예제 내려받기
 여러 분의 실습환경에 예제를 저장합니다.
 ```sh
@@ -21,6 +28,8 @@ brew install jq dateutils
 ## 설치
 [예제](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf)는 테라폼 설정 파일입니다. 이 파일에서는 EC2 인스턴스들을 생성합니다. 내용을 살펴본 후 AWS 자원 생성을 하기 위하여 테라폼 명령을 실행합니다.
 
+만약, 테라폼이 실습 환경에 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-ssm)로 이동해서 설치 안내를 따라합니다.
+
 테라폼 실행:
 ```sh
 terraform init
@@ -33,7 +42,11 @@ terraform apply -var-file tc1.tfvars
 ```
 
 ## 검증
-테라폼 명령을 수행하고 나면, 웜풀과 인스턴스를 볼 수 있습니다. 인스턴스는 user-data에 있는 스크립트를 활용하여 어플리케이션을 초기화 합니다. 이 스크립트에서는 초기화 작업이 오래 걸리는 상황을 가정한 내용이 포함되어 있습니다. 초기화가 완료되면 'Stopped' 상태로 전환되어 대기합니다.
+테라폼 명령을 수행하고 나면, 웜풀과 인스턴스를 볼 수 있습니다. 인스턴스는 user-data에 있는 스크립트를 활용하여 어플리케이션을 초기화 합니다. 이 스크립트에서는 초기화 작업이 오래 걸리는 상황을 가정한 내용이 포함되어 있습니다.
+
+![aws-asg-wp-init-instance](../../images/aws-asg-wp-init-instance.png)
+
+초기화가 완료되면 'Stopped' 상태로 전환되어 대기합니다.
 
 ![aws-asg-wp-stopped](../../images/aws-asg-wp-stopped.png)
 
