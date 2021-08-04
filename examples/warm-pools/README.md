@@ -42,7 +42,11 @@ terraform apply -var-file tc1.tfvars
 ```
 
 ## Verify
-After terraform apply, you will see an instance in the warm pools. That instance will be launched to run the user-data script for application initialization when it is registered with the warm-pool. After initialization, the instance state changes to 'Stopped' for waiting.
+After terraform apply, you will see an instance in the warm pools. That instance will be launched to run the user-data script for application initialization when it is registered with the warm-pool. In this example, the user-data script waits for a while to simulate a long working time.
+
+![aws-asg-wp-init-instance](../../images/aws-asg-wp-init-instance.png)
+
+After initialization, the instance state changes to 'Stopped' for waiting.
 
 ![aws-asg-wp-stopped](../../images/aws-asg-wp-stopped.png)
 

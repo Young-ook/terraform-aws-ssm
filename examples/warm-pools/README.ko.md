@@ -42,7 +42,11 @@ terraform apply -var-file tc1.tfvars
 ```
 
 ## 검증
-테라폼 명령을 수행하고 나면, 웜풀과 인스턴스를 볼 수 있습니다. 인스턴스는 user-data에 있는 스크립트를 활용하여 어플리케이션을 초기화 합니다. 이 스크립트에서는 초기화 작업이 오래 걸리는 상황을 가정한 내용이 포함되어 있습니다. 초기화가 완료되면 'Stopped' 상태로 전환되어 대기합니다.
+테라폼 명령을 수행하고 나면, 웜풀과 인스턴스를 볼 수 있습니다. 인스턴스는 user-data에 있는 스크립트를 활용하여 어플리케이션을 초기화 합니다. 이 스크립트에서는 초기화 작업이 오래 걸리는 상황을 가정한 내용이 포함되어 있습니다.
+
+![aws-asg-wp-init-instance](../../images/aws-asg-wp-init-instance.png)
+
+초기화가 완료되면 'Stopped' 상태로 전환되어 대기합니다.
 
 ![aws-asg-wp-stopped](../../images/aws-asg-wp-stopped.png)
 
