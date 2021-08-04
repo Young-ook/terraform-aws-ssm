@@ -28,7 +28,7 @@ brew install jq dateutils
 ## Setup
 [This](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf) is the example of terraform configuration file to create an EC2 instance which is managed by Systems Manager on your AWS account. Check out and apply it using terraform command.
 
-If you don't have the terraform tools in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-ssm) of this repository and follow the installation instructions.
+If you don't have the terraform tools in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-ssm#terraform) of this repository and follow the installation instructions.
 
 Run terraform:
 ```sh

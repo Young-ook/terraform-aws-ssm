@@ -28,7 +28,7 @@ brew install jq dateutils
 ## 설치
 [예제](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools/main.tf)는 테라폼 설정 파일입니다. 이 파일에서는 EC2 인스턴스들을 생성합니다. 내용을 살펴본 후 AWS 자원 생성을 하기 위하여 테라폼 명령을 실행합니다.
 
-만약, 테라폼이 실습 환경에 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-ssm)로 이동해서 설치 안내를 따라합니다.
+만약, 테라폼이 실습 환경에 없다면 메인 [페이지](https://github.com/Young-ook/terraform-aws-ssm#terraform)로 이동해서 설치 안내를 따라합니다.
 
 테라폼 실행:
 ```sh
