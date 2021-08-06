@@ -46,10 +46,10 @@ module "ec2" {
       name                        = "default"
       desired_size                = 0
       min_size                    = 0
-      max_size                    = 2
+      max_size                    = 3
       instance_type               = "t3.small"
       pool_state                  = "Stopped"
-      max_group_prepared_capacity = 1
+      max_group_prepared_capacity = 2
       user_data                   = templatefile("${path.module}/userdata.tpl", { lc_name = random_pet.asg.id })
     }
   ]
