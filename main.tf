@@ -44,7 +44,7 @@ resource "aws_iam_instance_profile" "asg" {
 }
 
 ## amazon-linux 2
-data "aws_ami" "ng" {
+data "aws_ami" "al2" {
   for_each    = { for ng in var.node_groups : ng.name => ng }
   owners      = ["amazon"]
   most_recent = true
@@ -59,7 +59,7 @@ data "aws_ami" "ng" {
   }
   filter {
     name   = "architecture"
-    values = [lookup(each.value, "arch", "x86_64")]
+    values = [length(regexall("ARM", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? "arm64" : "x86_64"]
   }
 }
 
@@ -67,7 +67,7 @@ resource "aws_launch_template" "ng" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   name          = join("-", [local.name, each.key])
   tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
-  image_id      = lookup(each.value, "image_id", data.aws_ami.ng[each.key].id)
+  image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
   user_data     = base64encode(lookup(each.value, "user_data", ""))
   instance_type = lookup(each.value, "instance_type", "t3.medium")
   key_name      = lookup(each.value, "key_name", null)
