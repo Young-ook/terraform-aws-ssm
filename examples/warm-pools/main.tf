@@ -1,7 +1,7 @@
 # EC2 Warm Pools
 
 terraform {
-  required_version = "1.0.3"
+  required_version = "~> 1.0"
 }
 
 provider "aws" {

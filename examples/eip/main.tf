@@ -1,7 +1,7 @@
 # bastion host using EIP
 
 terraform {
-  required_version = "1.0.3"
+  required_version = "~> 1.0"
 }
 
 provider "aws" {

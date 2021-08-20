@@ -1,7 +1,7 @@
 # AWS Fault Injection Simulator
 
 terraform {
-  required_version = "0.13.5"
+  required_version = "~> 1.0"
 }
 
 provider "aws" {
@@ -9,7 +9,6 @@ provider "aws" {
 }
 
 ### foundation/network
-# vpc
 module "vpc" {
   source              = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
   name                = var.name
@@ -22,7 +21,6 @@ module "vpc" {
   vpc_endpoint_config = []
 }
 
-### application/network
 resource "aws_lb" "alb" {
   name                       = local.alb_name
   tags                       = merge(local.default-tags, var.tags)
