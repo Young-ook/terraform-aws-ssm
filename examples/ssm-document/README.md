@@ -40,9 +40,10 @@ You can use Run Command, a capability of AWS Systems Manager, from the console t
 1. For Rate control:
     * For Concurrency, specify either a number or a percentage of instances on which to run the command at the same time.
 1. (Optional) For Output options, to save the command output to a file, select the Write command output to an S3 bucket box. Enter the bucket and prefix (folder) names in the boxes.
+1. Choose *Run*.
 
 ## Connect
-Move to the EC2 service page on the AWS Management Conosol and select Instances button on the left side menu. Find an instance that you launched. Select the instance and click 'Connect' button on top of the window. After then you will see three tabs EC2 Instance Connect, Session Manager, SSH client. Select Session Manager tab and follow the instruction on the screen.
+Move to the EC2 service page on the AWS Management Conosol and select Instances button on the left side menu. Find an instance that you launched. Select the instance and click *Connect* button on top of the window. After then you will see three tabs EC2 Instance Connect, Session Manager, SSH client. Select Session Manager tab and follow the instruction on the screen.
 
 ![aws-fis-ec2-disk-stress](../../images/aws-fis-ec2-disk-stress.png)
 
