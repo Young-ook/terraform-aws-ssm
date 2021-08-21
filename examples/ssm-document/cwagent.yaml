@@ -1,0 +1,31 @@
+---
+description: |
+  ### Document name - Install-CloudWatch-Agent
+
+  ## What does this document do?
+  It install and run aws cloudwatch agent.
+
+  ## Input Parameters
+  None.
+
+  ## Output Parameters
+  None.
+
+schemaVersion: '2.2'
+parameters:
+mainSteps:
+  - action: aws:runShellScript
+    name: InstallCloudWatchAgent
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    description: |
+      ## Parameters: None
+      This step will install and launch cloudwatch agent.
+    inputs:
+      maxAttempts: 1
+      runCommand:
+        - |
+          sudo yum -y install amazon-cloudwatch-agent
+          sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s
