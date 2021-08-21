@@ -6,6 +6,7 @@ output "ec2" {
 output "ssm-doc" {
   description = "The generated AWS Systems Manager Documents"
   value = {
-    diskfull = aws_ssm_document.diskfull
+    diskfull = aws_ssm_document.diskfull.arn
+    cwagent  = aws_ssm_document.cwagent.arn
   }
 }

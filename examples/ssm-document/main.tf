@@ -14,6 +14,7 @@ module "ec2" {
   name        = var.name
   tags        = var.tags
   node_groups = var.node_groups
+  policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
 }
 
 # ssm/document
@@ -22,4 +23,11 @@ resource "aws_ssm_document" "diskfull" {
   document_format = "YAML"
   document_type   = "Command"
   content         = file("${path.module}/diskfull.yaml")
+}
+
+resource "aws_ssm_document" "cwagent" {
+  name            = "Install-CloudWatch-Agent"
+  document_format = "YAML"
+  document_type   = "Command"
+  content         = file("${path.module}/cwagent.yaml")
 }
