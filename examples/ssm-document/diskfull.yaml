@@ -1,6 +1,6 @@
 ---
 description: |
-  ### Document name - CustomFIS-Run-Disk-Stress
+  ### Document name - Run-Disk-Stress
 
   ## What does this document do?
   It runs disk stress on an instance via stress-ng tool.

@@ -18,7 +18,7 @@ module "ec2" {
 
 # ssm/document
 resource "aws_ssm_document" "diskfull" {
-  name            = "CustomFIS-Run-Disk-Stress"
+  name            = "Run-Disk-Stress"
   document_format = "YAML"
   document_type   = "Command"
   content         = file("${path.module}/diskfull.yaml")
