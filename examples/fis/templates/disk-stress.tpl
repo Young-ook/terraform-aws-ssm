@@ -7,7 +7,8 @@
         "ec2-instances": {
             "resourceType": "aws:ec2:instance",
             "resourceTags": {
-                "env": "prod"
+                "env": "prod",
+                "release": "canary"
             },
             "filters": [
                 {
