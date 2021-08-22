@@ -114,10 +114,11 @@ resource "aws_lb_target_group" "http" {
 
 ### application/ec2
 module "ec2" {
-  source  = "../../"
-  name    = var.name
-  tags    = var.tags
-  subnets = values(module.vpc.subnets["private"])
+  source      = "../../"
+  name        = var.name
+  tags        = var.tags
+  subnets     = values(module.vpc.subnets["private"])
+  policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
   node_groups = [
     {
       name              = "baseline"
