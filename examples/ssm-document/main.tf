@@ -22,12 +22,12 @@ resource "aws_ssm_document" "diskfull" {
   name            = "Run-Disk-Stress"
   document_format = "YAML"
   document_type   = "Command"
-  content         = file("${path.module}/diskfull.yaml")
+  content         = file("${path.module}/templates/diskfull.yaml")
 }
 
 resource "aws_ssm_document" "cwagent" {
   name            = "Install-CloudWatch-Agent"
   document_format = "YAML"
   document_type   = "Command"
-  content         = file("${path.module}/cwagent.yaml")
+  content         = file("${path.module}/templates/cwagent.yaml")
 }
