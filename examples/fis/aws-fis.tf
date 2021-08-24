@@ -49,7 +49,7 @@ resource "local_file" "cpu-stress" {
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
   })
-  filename        = "${path.module}/cpu-stress.json"
+  filename        = "${path.module}/.fis/cpu-stress.json"
   file_permission = "0600"
 }
 
@@ -60,7 +60,7 @@ resource "local_file" "network-latency" {
     alarm  = local.stop_condition_alarm
     role   = aws_iam_role.fis-run.arn
   })
-  filename        = "${path.module}/network-latency.json"
+  filename        = "${path.module}/.fis/network-latency.json"
   file_permission = "0600"
 }
 
@@ -77,7 +77,7 @@ resource "local_file" "terminate-instances" {
     alarm = local.stop_condition_alarm
     role  = aws_iam_role.fis-run.arn
   })
-  filename        = "${path.module}/terminate-instances.json"
+  filename        = "${path.module}/.fis/terminate-instances.json"
   file_permission = "0600"
 }
 
@@ -87,7 +87,7 @@ resource "local_file" "throttle-ec2-api" {
     alarm    = local.stop_condition_alarm
     role     = aws_iam_role.fis-run.arn
   })
-  filename        = "${path.module}/throttle-ec2-api.json"
+  filename        = "${path.module}/.fis/throttle-ec2-api.json"
   file_permission = "0600"
 }
 
@@ -98,7 +98,7 @@ resource "local_file" "disk-stress" {
     alarm   = local.stop_condition_alarm
     role    = aws_iam_role.fis-run.arn
   })
-  filename        = "${path.module}/disk-stress.json"
+  filename        = "${path.module}/.fis/disk-stress.json"
   file_permission = "0600"
 }
 
@@ -112,7 +112,7 @@ resource "local_file" "create-templates" {
     "done",
     ]
   )
-  filename        = "${path.module}/fis-create-experiment-templates.sh"
+  filename        = "${path.module}/.fis/fis-create-experiment-templates.sh"
   file_permission = "0600"
 }
 
@@ -127,7 +127,7 @@ resource "null_resource" "create-templates" {
   ]
   provisioner "local-exec" {
     when    = create
-    command = "bash ${path.module}/fis-create-experiment-templates.sh"
+    command = "cd ${path.module}/.fis && bash fis-create-experiment-templates.sh"
   }
 }
 
@@ -141,7 +141,7 @@ resource "local_file" "delete-templates" {
     "rm $${OUTPUT}",
     ]
   )
-  filename        = "${path.module}/fis-delete-experiment-templates.sh"
+  filename        = "${path.module}/.fis/fis-delete-experiment-templates.sh"
   file_permission = "0600"
 }
 
@@ -154,9 +154,8 @@ resource "null_resource" "delete-templates" {
     local_file.disk-stress,
     local_file.delete-templates,
   ]
-
   provisioner "local-exec" {
     when    = destroy
-    command = "bash ${path.module}/fis-delete-experiment-templates.sh"
+    command = "cd ${path.module}/.fis && bash fis-delete-experiment-templates.sh"
   }
 }
