@@ -4,7 +4,7 @@ locals {
     "while true; do",
     "  curl -I http://${aws_lb.alb.dns_name}",
     "  echo",
-    "  sleep .1",
+    "  sleep 1",
     "done",
     ]
   )

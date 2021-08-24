@@ -128,7 +128,7 @@ module "ec2" {
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       tags              = { release = "baseline" }
-      user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+      user_data         = "#!/bin/bash\nsudo yum update -y\nsudo yum install -y httpd\nsudo rm /etc/httpd/conf.d/welcome.conf\nsudo systemctl start httpd"
     },
     {
       name              = "canary"
@@ -227,6 +227,23 @@ resource "aws_cloudwatch_metric_alarm" "api-avg" {
   unit                = "Seconds"
   statistic           = "Average"
   threshold           = 0.1
+
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "api-http503" {
+  alarm_name          = local.cw_api_http503_alarm_name
+  alarm_description   = "This metric monitors HTTP 503 response from backed ec2 instances"
+  tags                = merge(local.default-tags, var.tags)
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HTTPCode_ELB_502_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 3
 
   dimensions = {
     LoadBalancer = aws_lb.alb.arn_suffix
