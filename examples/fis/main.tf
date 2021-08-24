@@ -114,10 +114,9 @@ resource "aws_lb_target_group" "http" {
 
 ### application/ec2
 module "ec2" {
-  source      = "../../"
+  source      = "Young-ook/ssm/aws"
   name        = var.name
   tags        = var.tags
-  subnets     = values(module.vpc.subnets["private"])
   policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
   node_groups = [
     {
@@ -153,6 +152,16 @@ module "ec2" {
       user_data         = local.vclient
     }
   ]
+
+  ### Initially, this module places all ec2 instances in a specific Availability Zone (AZ).
+  ### This configuration is not fault tolerant when Single AZ goes down.
+  ### After our first attempt at experimenting with 'terminte ec2 instances'
+  ### we will scale the autoscaling-group cross-AZ for high availability.
+  ###
+  ### Switch the 'subnets' variable to the list of whole private subnets created in the example.
+
+  subnets = [module.vpc.subnets["private"][var.azs[random_integer.az.result]]]
+  # subnets = values(module.vpc.subnets["private"])
 }
 
 resource "aws_autoscaling_policy" "target-tracking" {
