@@ -114,10 +114,9 @@ resource "aws_lb_target_group" "http" {
 
 ### application/ec2
 module "ec2" {
-  source      = "../../"
+  source      = "Young-ook/ssm/aws"
   name        = var.name
   tags        = var.tags
-  subnets     = values(module.vpc.subnets["private"])
   policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
   node_groups = [
     {
@@ -129,7 +128,7 @@ module "ec2" {
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       tags              = { release = "baseline" }
-      user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+      user_data         = "#!/bin/bash\nsudo yum update -y\nsudo yum install -y httpd\nsudo rm /etc/httpd/conf.d/welcome.conf\nsudo systemctl start httpd"
     },
     {
       name              = "canary"
@@ -153,6 +152,16 @@ module "ec2" {
       user_data         = local.vclient
     }
   ]
+
+  ### Initially, this module places all ec2 instances in a specific Availability Zone (AZ).
+  ### This configuration is not fault tolerant when Single AZ goes down.
+  ### After our first attempt at experimenting with 'terminte ec2 instances'
+  ### we will scale the autoscaling-group cross-AZ for high availability.
+  ###
+  ### Switch the 'subnets' variable to the list of whole private subnets created in the example.
+
+  subnets = [module.vpc.subnets["private"][var.azs[random_integer.az.result]]]
+  # subnets = values(module.vpc.subnets["private"])
 }
 
 resource "aws_autoscaling_policy" "target-tracking" {
@@ -218,6 +227,23 @@ resource "aws_cloudwatch_metric_alarm" "api-avg" {
   unit                = "Seconds"
   statistic           = "Average"
   threshold           = 0.1
+
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "api-http503" {
+  alarm_name          = local.cw_api_http503_alarm_name
+  alarm_description   = "This metric monitors HTTP 503 response from backed ec2 instances"
+  tags                = merge(local.default-tags, var.tags)
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HTTPCode_ELB_502_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 3
 
   dimensions = {
     LoadBalancer = aws_lb.alb.arn_suffix
