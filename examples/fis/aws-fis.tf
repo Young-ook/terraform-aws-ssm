@@ -103,60 +103,48 @@ resource "local_file" "disk-stress" {
   file_permission = "0600"
 }
 
-resource "local_file" "create-templates" {
-  content = join("\n", [
-    "#!/bin/bash -ex",
-    "OUTPUT='.fis_cli_result'",
-    "TEMPLATES=('cpu-stress.json' 'network-latency.json' 'terminate-instances.json' 'throttle-ec2-api.json' 'disk-stress.json')",
-    "for template in $${TEMPLATES[@]}; do",
-    "  aws fis create-experiment-template --cli-input-json file://$${template} --output text --query 'experimentTemplate.id' 2>&1 | tee -a $${OUTPUT}",
-    "done",
-    ]
-  )
-  filename        = "${path.module}/.fis/fis-create-experiment-templates.sh"
+resource "local_file" "create-fis-templates" {
+  content = templatefile("${path.module}/templates/create-fis-templates.tpl", {
+    region = var.aws_region
+  })
+  filename        = "${path.module}/.fis/create-fis-templates.sh"
   file_permission = "0600"
 }
 
-resource "null_resource" "create-templates" {
+resource "null_resource" "create-fis-templates" {
   depends_on = [
     local_file.cpu-stress,
     local_file.network-latency,
     local_file.throttle-ec2-api,
     local_file.terminate-instances,
     local_file.disk-stress,
-    local_file.create-templates,
+    local_file.create-fis-templates,
   ]
   provisioner "local-exec" {
     when    = create
-    command = "cd ${path.module}/.fis && bash fis-create-experiment-templates.sh"
+    command = "cd ${path.module}/.fis && bash create-fis-templates.sh"
   }
 }
 
-resource "local_file" "delete-templates" {
-  content = join("\n", [
-    "#!/bin/bash -ex",
-    "OUTPUT='.fis_cli_result'",
-    "while read id; do",
-    "  aws fis delete-experiment-template --id $${id} --output text --query 'experimentTemplate.id' 2>&1 > /dev/null",
-    "done < $${OUTPUT}",
-    "rm $${OUTPUT}",
-    ]
-  )
-  filename        = "${path.module}/.fis/fis-delete-experiment-templates.sh"
+resource "local_file" "delete-fis-templates" {
+  content = templatefile("${path.module}/templates/delete-fis-templates.tpl", {
+    region = var.aws_region
+  })
+  filename        = "${path.module}/.fis/delete-fis-templates.sh"
   file_permission = "0600"
 }
 
-resource "null_resource" "delete-templates" {
+resource "null_resource" "delete-fis-templates" {
   depends_on = [
     local_file.cpu-stress,
     local_file.network-latency,
     local_file.throttle-ec2-api,
     local_file.terminate-instances,
     local_file.disk-stress,
-    local_file.delete-templates,
+    local_file.delete-fis-templates,
   ]
   provisioner "local-exec" {
     when    = destroy
-    command = "cd ${path.module}/.fis && bash fis-delete-experiment-templates.sh"
+    command = "cd ${path.module}/.fis && bash delete-fis-templates.sh"
   }
 }
