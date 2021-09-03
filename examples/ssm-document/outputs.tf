@@ -10,11 +10,3 @@ output "ssm-doc" {
     cwagent  = aws_ssm_document.cwagent.arn
   }
 }
-
-resource "local_file" "ssm-run-command" {
-  content = templatefile("${path.module}/templates/ssm-run-command.tpl", {
-    region = var.aws_region
-  })
-  filename        = "${path.module}/ssm-run-command.sh"
-  file_permission = "0600"
-}
