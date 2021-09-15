@@ -233,9 +233,9 @@ resource "aws_cloudwatch_metric_alarm" "api-avg" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "api-http503" {
-  alarm_name          = local.cw_api_http503_alarm_name
-  alarm_description   = "This metric monitors HTTP 503 response from backed ec2 instances"
+resource "aws_cloudwatch_metric_alarm" "api-http502" {
+  alarm_name          = local.cw_api_http502_alarm_name
+  alarm_description   = "This metric monitors HTTP 502 response from backed ec2 instances"
   tags                = merge(local.default-tags, var.tags)
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
