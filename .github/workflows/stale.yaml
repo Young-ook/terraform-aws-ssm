@@ -1,0 +1,13 @@
+on:
+  schedule:
+  - cron: $cron-daily
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - name: Close Stale Issues
+      uses: actions/stale@v3
