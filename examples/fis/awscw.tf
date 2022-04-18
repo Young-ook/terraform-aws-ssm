@@ -1,21 +1,17 @@
-resource "time_sleep" "wait" {
-  depends_on      = [module.ec2]
-  create_duration = "30s"
-}
-
+### monitoring/agent
 resource "aws_ssm_association" "cwagent" {
-  depends_on = [time_sleep.wait]
-  name       = "AmazonCloudWatch-ManageAgent"
+  association_name = "SSM-StartCWAgent"
+  name             = "AmazonCloudWatch-ManageAgent"
   parameters = {
     action = "start"
   }
   targets {
     key    = "tag:release"
-    values = ["baseline,canary"]
+    values = ["baseline", "canary"]
   }
 }
 
-### application/monitoring
+### monitoring/alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name                = local.cw_cpu_alarm_name
   alarm_description         = "This metric monitors ec2 cpu utilization"
