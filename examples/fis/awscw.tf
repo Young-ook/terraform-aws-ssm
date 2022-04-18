@@ -1,38 +1,17 @@
-resource "aws_ssm_association" "install-cwagent" {
-  depends_on = [module.ec2]
-  name       = "AWS-ConfigureAWSPackage"
-
-  targets {
-    key    = "tag:release"
-    values = ["baseline,canary"]
-  }
-
-  parameters = {
-    action = "Install"
-    name   = "AmazonCloudWatchAgent"
-  }
-}
-
-resource "time_sleep" "wait" {
-  depends_on      = [aws_ssm_association.install-cwagent]
-  create_duration = "30s"
-}
-
-resource "aws_ssm_association" "start-cwagent" {
-  depends_on = [time_sleep.wait]
-  name       = "AmazonCloudWatch-ManageAgent"
-
-  targets {
-    key    = "tag:release"
-    values = ["baseline,canary"]
-  }
-
+### monitoring/agent
+resource "aws_ssm_association" "cwagent" {
+  association_name = "SSM-StartCWAgent"
+  name             = "AmazonCloudWatch-ManageAgent"
   parameters = {
     action = "start"
   }
+  targets {
+    key    = "tag:release"
+    values = ["baseline", "canary"]
+  }
 }
 
-### application/monitoring
+### monitoring/alarm
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name                = local.cw_cpu_alarm_name
   alarm_description         = "This metric monitors ec2 cpu utilization"
@@ -45,7 +24,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   statistic                 = "Average"
   threshold                 = 60
   insufficient_data_actions = []
-
   dimensions = {
     AutoScalingGroupName = module.ec2.cluster.data_plane.node_groups.baseline.name
   }
@@ -63,7 +41,6 @@ resource "aws_cloudwatch_metric_alarm" "api-p90" {
   unit                = "Seconds"
   threshold           = 0.1
   extended_statistic  = "p90"
-
   dimensions = {
     LoadBalancer = aws_lb.alb.arn_suffix
   }
@@ -81,4 +58,23 @@ resource "aws_cloudwatch_metric_alarm" "api-avg" {
   unit                = "Seconds"
   statistic           = "Average"
   threshold           = 0.1
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
+}
 
+resource "aws_cloudwatch_metric_alarm" "api-http502" {
+  alarm_name          = local.cw_api_http502_alarm_name
+  alarm_description   = "This metric monitors HTTP 502 response from backed ec2 instances"
+  tags                = merge(local.default-tags, var.tags)
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "HTTPCode_ELB_502_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 3
+  dimensions = {
+    LoadBalancer = aws_lb.alb.arn_suffix
+  }
+}

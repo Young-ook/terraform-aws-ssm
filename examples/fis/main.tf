@@ -8,7 +8,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-### foundation/network
+### network/vpc
 module "vpc" {
   source              = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
   name                = var.name
@@ -19,16 +19,6 @@ module "vpc" {
   enable_ngw          = true
   single_ngw          = true
   vpc_endpoint_config = []
-}
-
-resource "aws_lb" "alb" {
-  name                       = local.alb_name
-  tags                       = merge(local.default-tags, var.tags)
-  internal                   = true
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.alb.id]
-  subnets                    = values(module.vpc.subnets["private"])
-  enable_deletion_protection = false
 }
 
 # security/firewall
@@ -81,6 +71,17 @@ resource "aws_security_group" "alb_aware" {
   }
 }
 
+### network/loadbalancer
+resource "aws_lb" "alb" {
+  name                       = local.alb_name
+  tags                       = merge(local.default-tags, var.tags)
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.alb.id]
+  subnets                    = values(module.vpc.subnets["private"])
+  enable_deletion_protection = false
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
@@ -112,8 +113,29 @@ resource "aws_lb_target_group" "http" {
   }
 }
 
+### application/script
+locals {
+  vclient = join("\n", [
+    "#!/bin/bash",
+    "while true; do",
+    "  curl -I http://${aws_lb.alb.dns_name}",
+    "  echo",
+    "  sleep 1",
+    "done",
+    ]
+  )
+  vserver = join("\n", [
+    "sudo yum update -y",
+    "sudo yum install -y httpd",
+    "sudo rm /etc/httpd/conf.d/welcome.conf",
+    "sudo systemctl start httpd",
+    ]
+  )
+}
+
 ### application/ec2
 module "ec2" {
+  depends_on  = [aws_ssm_association.cwagent]
   source      = "Young-ook/ssm/aws"
   name        = var.name
   tags        = var.tags
@@ -128,7 +150,7 @@ module "ec2" {
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       tags              = { release = "baseline" }
-      user_data         = "#!/bin/bash\nsudo yum update -y\nsudo yum install -y httpd\nsudo rm /etc/httpd/conf.d/welcome.conf\nsudo systemctl start httpd"
+      user_data         = local.vserver
     },
     {
       name              = "canary"
@@ -139,7 +161,7 @@ module "ec2" {
       security_groups   = [aws_security_group.alb_aware.id]
       target_group_arns = [aws_lb_target_group.http.arn]
       tags              = { release = "canary" }
-      user_data         = "#!/bin/bash\namazon-linux-extras install nginx1\nsystemctl start nginx"
+      user_data         = local.vserver
     },
     {
       name              = "loadgen"
@@ -156,7 +178,7 @@ module "ec2" {
   ### Initially, this module places all ec2 instances in a specific Availability Zone (AZ).
   ### This configuration is not fault tolerant when Single AZ goes down.
   ### After our first attempt at experimenting with 'terminte ec2 instances'
-  ### we will scale the autoscaling-group cross-AZ for high availability.
+  ### We will scale the autoscaling-group cross-AZ for high availability.
   ###
   ### Switch the 'subnets' variable to the list of whole private subnets created in the example.
 

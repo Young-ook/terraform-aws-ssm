@@ -1,8 +1,7 @@
 ## ec2 autoscaling groups with systems manager/session manager
 
-module "current" {
+module "aws" {
   source  = "Young-ook/spinnaker/aws//modules/aws-partitions"
-  version = ">= 2.0"
 }
 
 ## features
@@ -21,7 +20,7 @@ resource "aws_iam_role" "asg" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = [format("ec2.%s", module.current.partition.dns_suffix)]
+        Service = [format("ec2.%s", module.aws.partition.dns_suffix)]
       }
     }]
     Version = "2012-10-17"
@@ -29,7 +28,7 @@ resource "aws_iam_role" "asg" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm-managed" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.current.partition.partition)
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.aws.partition.partition)
   role       = aws_iam_role.asg.id
 }
 
@@ -63,12 +62,32 @@ data "aws_ami" "al2" {
   }
 }
 
+data "cloudinit_config" "ng" {
+  for_each      = { for ng in var.node_groups : ng.name => ng }
+  base64_encode = true
+  gzip          = false
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = <<-EOT
+    #!/bin/bash
+    sudo yum update -y
+    yum install -y amazon-cloudwatch-agent
+    EOT
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = lookup(each.value, "user_data", "")
+  }
+}
+
 resource "aws_launch_template" "ng" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   name          = join("-", [local.name, each.key])
   tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
   image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
-  user_data     = base64encode(lookup(each.value, "user_data", ""))
+  user_data     = data.cloudinit_config.ng[each.key].rendered
   instance_type = lookup(each.value, "instance_type", "t3.medium")
   key_name      = lookup(each.value, "key_name", null)
 
