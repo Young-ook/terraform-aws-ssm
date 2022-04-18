@@ -1,8 +1,7 @@
 ## ec2 autoscaling groups with systems manager/session manager
 
-module "current" {
+module "aws" {
   source  = "Young-ook/spinnaker/aws//modules/aws-partitions"
-  version = ">= 2.0"
 }
 
 ## features
@@ -21,7 +20,7 @@ resource "aws_iam_role" "asg" {
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = [format("ec2.%s", module.current.partition.dns_suffix)]
+        Service = [format("ec2.%s", module.aws.partition.dns_suffix)]
       }
     }]
     Version = "2012-10-17"
@@ -29,7 +28,7 @@ resource "aws_iam_role" "asg" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm-managed" {
-  policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.current.partition.partition)
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.aws.partition.partition)
   role       = aws_iam_role.asg.id
 }
 
