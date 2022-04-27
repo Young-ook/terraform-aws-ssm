@@ -2,10 +2,24 @@
 
 terraform {
   required_version = "~> 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 3.71"
+    }
+  }
 }
 
 provider "aws" {
   region = var.aws_region
+}
+
+# default vpc
+module "vpc" {
+  source  = "Young-ook/vpc/aws"
+  version = "1.0.1"
+  name    = var.name
+  tags    = var.tags
 }
 
 # ec2
@@ -13,8 +27,9 @@ module "ec2" {
   source      = "../../"
   name        = var.name
   tags        = var.tags
-  node_groups = var.node_groups
+  subnets     = values(module.vpc.subnets["public"])
   policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+  node_groups = var.node_groups
 }
 
 # ssm/document
