@@ -2,6 +2,12 @@
 
 terraform {
   required_version = "~> 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 3.71"
+    }
+  }
 }
 
 provider "aws" {
@@ -34,11 +40,20 @@ resource "aws_iam_policy" "eip" {
   })
 }
 
+# default vpc
+module "vpc" {
+  source  = "Young-ook/vpc/aws"
+  version = "1.0.1"
+  name    = var.name
+  tags    = var.tags
+}
+
 # ec2
 module "ec2" {
   source      = "../../"
   name        = var.name
   tags        = merge(var.tags, { eipAllocId = aws_eip.eip.id })
+  subnets     = values(module.vpc.subnets["public"])
   policy_arns = [aws_iam_policy.eip.arn]
   node_groups = [
     {

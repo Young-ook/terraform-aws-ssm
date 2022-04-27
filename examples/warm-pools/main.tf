@@ -2,6 +2,12 @@
 
 terraform {
   required_version = "~> 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 3.71"
+    }
+  }
 }
 
 provider "aws" {
@@ -35,11 +41,20 @@ resource "aws_iam_policy" "lc" {
   })
 }
 
+# default vpc
+module "vpc" {
+  source  = "Young-ook/vpc/aws"
+  version = "1.0.1"
+  name    = var.name
+  tags    = var.tags
+}
+
 # ec2
 module "ec2" {
   source      = "../../"
   name        = random_pet.asg.id
   tags        = var.tags
+  subnets     = values(module.vpc.subnets["public"])
   policy_arns = [aws_iam_policy.lc.arn]
   warm_pools = [
     {

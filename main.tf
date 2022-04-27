@@ -1,7 +1,7 @@
 ## ec2 autoscaling groups with systems manager/session manager
 
 module "aws" {
-  source  = "Young-ook/spinnaker/aws//modules/aws-partitions"
+  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
 }
 
 ## features
@@ -123,7 +123,7 @@ resource "aws_launch_template" "ng" {
 resource "aws_autoscaling_group" "ng" {
   for_each              = { for ng in var.node_groups : ng.name => ng }
   name                  = join("-", [local.name, each.key])
-  vpc_zone_identifier   = local.subnet_ids
+  vpc_zone_identifier   = var.subnets
   max_size              = lookup(each.value, "max_size", 3)
   min_size              = lookup(each.value, "min_size", 1)
   desired_capacity      = lookup(each.value, "desired_size", 1)
@@ -250,7 +250,7 @@ resource "aws_launch_template" "wp" {
 resource "aws_autoscaling_group" "wp" {
   for_each              = { for wp in var.warm_pools : wp.name => wp }
   name                  = join("-", [local.name, each.key])
-  vpc_zone_identifier   = local.subnet_ids
+  vpc_zone_identifier   = var.subnets
   max_size              = lookup(each.value, "max_size", 3)
   min_size              = lookup(each.value, "min_size", 1)
   desired_capacity      = lookup(each.value, "desired_size", 1)
