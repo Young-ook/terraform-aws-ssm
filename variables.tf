@@ -9,11 +9,6 @@ variable "node_groups" {
   default     = []
 }
 
-variable "warm_pools" {
-  description = "Warm pools definition"
-  default     = []
-}
-
 ### security
 variable "policy_arns" {
   description = "A list of policy ARNs to attach the node groups role"
