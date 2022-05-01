@@ -215,7 +215,5 @@ resource "aws_autoscaling_group" "ng" {
     ignore_changes        = [name]
   }
 
-  depends_on = [
-    aws_launch_template.ng,
-  ]
+  depends_on = [aws_launch_template.ng]
 }
