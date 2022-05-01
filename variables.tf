@@ -9,13 +9,6 @@ variable "node_groups" {
   default     = []
 }
 
-### security
-variable "policy_arns" {
-  description = "A list of policy ARNs to attach the node groups role"
-  type        = list(string)
-  default     = []
-}
-
 ### description
 variable "name" {
   description = "The logical name of the module instance"
