@@ -12,10 +12,12 @@ locals {
 
 ## autoscaling groups (asg)
 # security/policy
-resource "aws_iam_role" "asg" {
-  name = join("-", [local.name, "asg"])
-  tags = merge(local.default-tags, var.tags)
+resource "aws_iam_role" "ng" {
+  for_each = { for ng in var.node_groups : ng.name => ng }
+  name     = join("-", [local.name, "ng", each.key])
+  tags     = merge(local.default-tags, var.tags)
   assume_role_policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
@@ -23,23 +25,33 @@ resource "aws_iam_role" "asg" {
         Service = [format("ec2.%s", module.aws.partition.dns_suffix)]
       }
     }]
-    Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ssm-managed" {
+resource "aws_iam_role_policy_attachment" "ng-ssm" {
+  for_each   = { for ng in var.node_groups : ng.name => ng }
   policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.aws.partition.partition)
-  role       = aws_iam_role.asg.id
+  role       = aws_iam_role.ng[each.key].id
 }
 
-resource "aws_iam_role_policy_attachment" "extra" {
-  for_each   = { for key, val in var.policy_arns : key => val }
-  policy_arn = each.value
-  role       = aws_iam_role.asg.id
+resource "aws_iam_role_policy_attachment" "ng" {
+  for_each = { for k, v in [for p in chunklist(flatten(
+    [
+      for k, v in var.node_groups : setproduct([v.name], v.policy_arns)
+      if(length(lookup(v, "policy_arns", [])) > 0)
+    ]), 2) :
+    {
+      role   = p[0]
+      policy = p[1]
+    }
+  ] : k => v }
+  policy_arn = each.value.policy
+  role       = aws_iam_role.ng[each.value.role].id
 }
 
-resource "aws_iam_instance_profile" "asg" {
-  role = aws_iam_role.asg.name
+resource "aws_iam_instance_profile" "ng" {
+  for_each = { for ng in var.node_groups : ng.name => ng }
+  role     = aws_iam_role.ng[each.key].id
 }
 
 ## amazon-linux 2
@@ -92,7 +104,7 @@ resource "aws_launch_template" "ng" {
   key_name      = lookup(each.value, "key_name", null)
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.asg.arn
+    arn = aws_iam_instance_profile.ng[each.key].arn
   }
 
   block_device_mappings {
@@ -189,6 +201,49 @@ resource "aws_autoscaling_group" "ng" {
   ]
 }
 
+# security/policy
+resource "aws_iam_role" "wp" {
+  for_each = { for wp in var.warm_pools : wp.name => wp }
+  name     = join("-", [local.name, "wp", each.key])
+  tags     = merge(local.default-tags, var.tags)
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = [format("ec2.%s", module.aws.partition.dns_suffix)]
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "wp-ssm" {
+  for_each   = { for wp in var.warm_pools : wp.name => wp }
+  policy_arn = format("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", module.aws.partition.partition)
+  role       = aws_iam_role.wp[each.key].id
+}
+
+resource "aws_iam_role_policy_attachment" "wp" {
+  for_each = { for k, v in [for p in chunklist(flatten(
+    [
+      for k, v in var.warm_pools : setproduct([v.name], v.policy_arns)
+      if(length(lookup(v, "policy_arns", [])) > 0)
+    ]), 2) :
+    {
+      role   = p[0]
+      policy = p[1]
+    }
+  ] : k => v }
+  policy_arn = each.value.policy
+  role       = aws_iam_role.wp[each.value.role].id
+}
+
+resource "aws_iam_instance_profile" "wp" {
+  for_each = { for wp in var.warm_pools : wp.name => wp }
+  role     = aws_iam_role.wp[each.key].id
+}
+
 ## amazon-linux 2
 data "aws_ami" "wp" {
   for_each    = { for wp in var.warm_pools : wp.name => wp }
@@ -219,7 +274,7 @@ resource "aws_launch_template" "wp" {
   key_name      = lookup(each.value, "key_name", null)
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.asg.arn
+    arn = aws_iam_instance_profile.wp[each.key].arn
   }
 
   block_device_mappings {
