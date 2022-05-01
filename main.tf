@@ -148,32 +148,52 @@ resource "aws_autoscaling_group" "ng" {
     "GroupTerminatingInstances", "GroupDesiredCapacity", "GroupTotalInstances", "GroupMaxSize",
   ]
 
-  mixed_instances_policy {
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.ng[each.key].id
-        version            = aws_launch_template.ng[each.key].latest_version
+  dynamic "mixed_instances_policy" {
+    for_each = (length(lookup(each.value, "warm_pool", [])) == 0 ? [each.value] : [])
+    content {
+      launch_template {
+        launch_template_specification {
+          launch_template_id = aws_launch_template.ng[mixed_instances_policy.value.name].id
+          version            = aws_launch_template.ng[mixed_instances_policy.value.name].latest_version
+        }
+
+        dynamic "override" {
+          for_each = lookup(mixed_instances_policy.value, "instances_override", [])
+          content {
+            instance_type     = lookup(override.value, "instance_type", null)
+            weighted_capacity = lookup(override.value, "weighted_capacity", null)
+          }
+        }
       }
 
-      dynamic "override" {
-        for_each = lookup(each.value, "instances_override", [])
+      dynamic "instances_distribution" {
+        for_each = { for k, v in mixed_instances_policy.value : k => v if k == "instances_distribution" }
         content {
-          instance_type     = lookup(override.value, "instance_type", null)
-          weighted_capacity = lookup(override.value, "weighted_capacity", null)
+          on_demand_allocation_strategy            = lookup(instances_distribution.value, "on_demand_allocation_strategy", null)
+          on_demand_base_capacity                  = lookup(instances_distribution.value, "on_demand_base_capacity", null)
+          on_demand_percentage_above_base_capacity = lookup(instances_distribution.value, "on_demand_percentage_above_base_capacity", null)
+          spot_allocation_strategy                 = lookup(instances_distribution.value, "spot_allocation_strategy", null)
+          spot_instance_pools                      = lookup(instances_distribution.value, "spot_instance_pools", null)
+          spot_max_price                           = lookup(instances_distribution.value, "spot_max_price", null)
         }
       }
     }
+  }
 
-    dynamic "instances_distribution" {
-      for_each = { for key, val in each.value : key => val if key == "instances_distribution" }
-      content {
-        on_demand_allocation_strategy            = lookup(instances_distribution.value, "on_demand_allocation_strategy", null)
-        on_demand_base_capacity                  = lookup(instances_distribution.value, "on_demand_base_capacity", null)
-        on_demand_percentage_above_base_capacity = lookup(instances_distribution.value, "on_demand_percentage_above_base_capacity", null)
-        spot_allocation_strategy                 = lookup(instances_distribution.value, "spot_allocation_strategy", null)
-        spot_instance_pools                      = lookup(instances_distribution.value, "spot_instance_pools", null)
-        spot_max_price                           = lookup(instances_distribution.value, "spot_max_price", null)
-      }
+  dynamic "launch_template" {
+    for_each = (length(lookup(each.value, "warm_pool", [])) > 0 ? [each.value] : [])
+    content {
+      id      = aws_launch_template.ng[launch_template.value.name].id
+      version = aws_launch_template.ng[launch_template.value.name].latest_version
+    }
+  }
+
+  dynamic "warm_pool" {
+    for_each = flatten([lookup(each.value, "warm_pool", [])])
+    content {
+      pool_state                  = lookup(warm_pool.value, "pool_state", "Stopped")
+      min_size                    = lookup(warm_pool.value, "min_pool_size", 0)
+      max_group_prepared_capacity = lookup(warm_pool.value, "max_group_prepared_capacity", 0)
     }
   }
 
