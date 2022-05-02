@@ -50,11 +50,10 @@ module "vpc" {
 
 # ec2
 module "ec2" {
-  source      = "../../"
-  name        = var.name
-  tags        = merge(var.tags, { eipAllocId = aws_eip.eip.id })
-  subnets     = values(module.vpc.subnets["public"])
-  policy_arns = [aws_iam_policy.eip.arn]
+  source  = "../../"
+  name    = var.name
+  tags    = merge(var.tags, { eipAllocId = aws_eip.eip.id })
+  subnets = values(module.vpc.subnets["public"])
   node_groups = [
     {
       name          = "gateway"
@@ -63,6 +62,7 @@ module "ec2" {
       max_size      = 1
       instance_type = "t3.small"
       user_data     = file("${path.module}/userdata.tpl")
+      policy_arns   = [aws_iam_policy.eip.arn]
     }
   ]
 }
