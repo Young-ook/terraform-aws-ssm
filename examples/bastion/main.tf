@@ -8,16 +8,18 @@ provider "aws" {
   region = var.aws_region
 }
 
-# isolated vpc
+# vpc
 module "vpc" {
-  source     = "Young-ook/spinnaker/aws//modules/spinnaker-aware-aws-vpc"
-  name       = var.name
-  tags       = var.tags
-  azs        = var.azs
-  cidr       = var.cidr
-  enable_igw = var.enable_igw
-  enable_ngw = var.enable_ngw
-  single_ngw = var.single_ngw
+  source      = "Young-ook/vpc/aws"
+  version     = "1.0.1"
+  name        = var.name
+  tags        = var.tags
+  vpc_config  = var.vpc_config
+  vpce_config = var.vpce_config
+}
+
+locals {
+  default_vpc = var.vpc_config == null || var.vpc_config == {} ? true : false
 }
 
 # ec2
@@ -25,6 +27,6 @@ module "ec2" {
   source      = "../../"
   name        = var.name
   tags        = var.tags
-  subnets     = values(module.vpc.subnets["private"])
+  subnets     = values(module.vpc.subnets[local.default_vpc ? "public" : "private"])
   node_groups = var.node_groups
 }

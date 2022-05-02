@@ -7,40 +7,14 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "cidr" {
-  description = "The vpc CIDR (e.g. 10.0.0.0/16)"
-  type        = string
-  default     = "10.0.0.0/16"
+variable "vpc_config" {
+  description = "A Virtual Private Cloud (VPC) configuration"
+  default     = {}
 }
 
-variable "azs" {
-  description = "A list of availability zones for the vpc to deploy resources"
-  type        = list(string)
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
-}
-
-variable "private_subnets" {
-  description = "A list of CIDRs for private subnets"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-}
-
-variable "enable_igw" {
-  description = "Should be true if you want to provision Internet Gateway for internet facing communication"
-  type        = bool
-  default     = true
-}
-
-variable "enable_ngw" {
-  description = "Should be true if you want to provision NAT Gateway(s) across all of private networks"
-  type        = bool
-  default     = false
-}
-
-variable "single_ngw" {
-  description = "Should be true if you want to provision a single shared NAT Gateway across all of private networks"
-  type        = bool
-  default     = false
+variable "vpce_config" {
+  description = "A Virtual Private Cloud (VPC) endpoints configuration"
+  default     = []
 }
 
 variable "node_groups" {
@@ -52,7 +26,6 @@ variable "node_groups" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "ssm"
 }
 
 ### tags
