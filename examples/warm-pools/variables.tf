@@ -13,11 +13,6 @@ variable "node_groups" {
   default     = []
 }
 
-variable "warm_pools" {
-  description = "Warm pools definition"
-  default     = []
-}
-
 ### description
 variable "name" {
   description = "The logical name of the module instance"

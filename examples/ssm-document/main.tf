@@ -24,12 +24,19 @@ module "vpc" {
 
 # ec2
 module "ec2" {
-  source      = "../../"
-  name        = var.name
-  tags        = var.tags
-  subnets     = values(module.vpc.subnets["public"])
-  policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
-  node_groups = var.node_groups
+  source  = "../../"
+  name    = var.name
+  tags    = var.tags
+  subnets = values(module.vpc.subnets["public"])
+  node_groups = [
+    {
+      name          = "default"
+      desired_size  = 1
+      instance_type = "t3.small"
+      ami_type      = "AL2_x86_64"
+      policy_arns   = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+    },
+  ]
 }
 
 # ssm/document
