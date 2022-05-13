@@ -127,7 +127,6 @@ resource "aws_launch_template" "ng" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [name]
   }
 }
 
@@ -212,7 +211,6 @@ resource "aws_autoscaling_group" "ng" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [name]
   }
 
   depends_on = [aws_launch_template.ng]
