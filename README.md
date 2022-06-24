@@ -5,7 +5,9 @@
 - [Bastion host using AWS Session Manager](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/bastion)
 - [Bastion host using EIP for allowlist firewall](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/eip)
 - [AWS Fault Injection Simulator with AWS Systems Manager](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/ec2)
-- [AWS Fault Injection Simulator with Amazon Elastic Kubernetes Service](https://github.com/Young-ook/terraform-aws-eks/blob/main/examples/fis)
+- [AWS Fault Injection Simulator with Amazon Elastic Kubernetes Service](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/eks)
+- [AWS Fault Injection Simulator with Amazon ElastiCach for Redis](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/redis)
+- [AWS Fault Injection Simulator with Amazon Relational Database Service](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/rds)
 - [EC2 Autoscaling Warm Pools](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/warm-pools)
 
 ## Getting started
