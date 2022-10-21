@@ -1,6 +1,6 @@
 ### network
 variable "subnets" {
-  description = "The list of subnet IDs to deploy your EKS cluster"
+  description = "The list of subnet IDs to deploy your EC2 cluster"
   type        = list(string)
 }
 
