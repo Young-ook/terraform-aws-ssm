@@ -52,3 +52,8 @@ Run terraform:
 terraform init
 terraform apply
 ```
+
+## Connect
+Move to the EC2 service page on the AWS Management Conosol and select Instances button on the left side menu. Find an instance that you launched. Select the instance and click *Connect* button on top of the window. After then you will see three tabs EC2 Instance Connect, Session Manager, SSH client. Select Session Manager tab and follow the instruction on the screen.
+
+![aws-fis-ec2-disk-stress](images/aws-fis-ec2-disk-stress.png)
