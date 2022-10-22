@@ -195,12 +195,12 @@ resource "aws_autoscaling_group" "ng" {
     }
   }
 
+  # name tag must be applied last
   dynamic "tag" {
     for_each = merge(
-      { "Name" = join("-", [local.name, each.key]) },
-      local.default-tags,
-      var.tags,
-      lookup(each.value, "tags", {})
+      local.default-tags, var.tags,
+      lookup(each.value, "tags", {}),
+      { "Name" = join("-", [local.name, each.key]) }
     )
     content {
       key                 = tag.key
