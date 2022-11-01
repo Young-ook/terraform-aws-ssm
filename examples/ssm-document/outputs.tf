@@ -8,5 +8,6 @@ output "ssm-doc" {
   value = {
     diskfull = aws_ssm_document.diskfull.arn
     cwagent  = aws_ssm_document.cwagent.arn
+    envoy    = aws_ssm_document.envoy.arn
   }
 }
