@@ -79,8 +79,9 @@ resource "aws_ssm_document" "envoy" {
 }
 
 resource "aws_ssm_association" "cwagent" {
-  depends_on = [module.ec2]
-  name       = aws_ssm_document.cwagent.name
+  for_each         = toset(lookup(var.features, "cwagent", false) ? ["enabled"] : [])
+  name             = aws_ssm_document.cwagent.name
+  association_name = "Install-CloudWatchAgent"
   targets {
     key    = "tag:env"
     values = ["dev"]
@@ -93,8 +94,10 @@ resource "time_sleep" "wait" {
 }
 
 resource "aws_ssm_association" "diskfull" {
-  depends_on = [time_sleep.wait]
-  name       = aws_ssm_document.diskfull.name
+  for_each         = toset(lookup(var.features, "diskfull", false) ? ["enabled"] : [])
+  depends_on       = [time_sleep.wait]
+  name             = aws_ssm_document.diskfull.name
+  association_name = "Run-Disk-Stress-Test"
   parameters = {
     DurationSeconds = "60"
     Workers         = "4"
@@ -107,9 +110,10 @@ resource "aws_ssm_association" "diskfull" {
 }
 
 resource "aws_ssm_association" "envoy" {
+  for_each         = toset(lookup(var.features, "envoy", false) ? ["enabled"] : [])
   depends_on       = [time_sleep.wait]
   name             = aws_ssm_document.envoy.name
-  association_name = "Install-Envoy"
+  association_name = "Install-EnvoyProxy"
   parameters = {
     region       = var.aws_region
     mesh         = "app"
