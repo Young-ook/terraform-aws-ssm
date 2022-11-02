@@ -14,7 +14,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-# default vpc
+### network/vpc (default vpc)
 module "vpc" {
   source  = "Young-ook/vpc/aws"
   version = "1.0.1"
@@ -22,24 +22,41 @@ module "vpc" {
   tags    = var.tags
 }
 
-# ec2
+### ec2
 module "ec2" {
-  source  = "../../"
+  source  = "Young-ook/ssm/aws"
+  version = "1.0.3"
   name    = var.name
   tags    = var.tags
   subnets = values(module.vpc.subnets["public"])
   node_groups = [
     {
       name          = "default"
+      tags          = merge(var.tags, { envoy = "enabled" })
       desired_size  = 1
       instance_type = "t3.small"
       ami_type      = "AL2_x86_64"
-      policy_arns   = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+      user_data     = local.server
+      policy_arns = [
+        "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      ]
     },
   ]
 }
 
-# ssm/document
+### application/script
+locals {
+  server = join("\n", [
+    "sudo yum update -y",
+    "sudo yum install -y httpd",
+    "sudo rm /etc/httpd/conf.d/welcome.conf",
+    "sudo systemctl start httpd",
+    ]
+  )
+}
+
+### management/document (playbook)
 resource "aws_ssm_document" "diskfull" {
   name            = "Run-Disk-Stress"
   document_format = "YAML"
@@ -54,10 +71,16 @@ resource "aws_ssm_document" "cwagent" {
   content         = file("${path.module}/templates/cwagent.yaml")
 }
 
+resource "aws_ssm_document" "envoy" {
+  name            = "Install-EnvoyProxy"
+  document_format = "YAML"
+  document_type   = "Command"
+  content         = file(join("/", [path.module, "templates", "envoy.yaml"]))
+}
+
 resource "aws_ssm_association" "cwagent" {
   depends_on = [module.ec2]
   name       = aws_ssm_document.cwagent.name
-
   targets {
     key    = "tag:env"
     values = ["dev"]
@@ -66,21 +89,36 @@ resource "aws_ssm_association" "cwagent" {
 
 resource "time_sleep" "wait" {
   depends_on      = [aws_ssm_association.cwagent]
-  create_duration = "30s"
+  create_duration = "15s"
 }
 
 resource "aws_ssm_association" "diskfull" {
   depends_on = [time_sleep.wait]
   name       = aws_ssm_document.diskfull.name
-
-  targets {
-    key    = "tag:env"
-    values = ["dev"]
-  }
-
   parameters = {
     DurationSeconds = "60"
     Workers         = "4"
     Percent         = "70"
+  }
+  targets {
+    key    = "tag:env"
+    values = ["dev"]
+  }
+}
+
+resource "aws_ssm_association" "envoy" {
+  depends_on       = [time_sleep.wait]
+  name             = aws_ssm_document.envoy.name
+  association_name = "Install-Envoy"
+  parameters = {
+    region       = var.aws_region
+    mesh         = "app"
+    vnode        = "service"
+    envoyVersion = "v1.23.1.0"
+    appPort      = "80"
+  }
+  targets {
+    key    = "tag:envoy"
+    values = ["enabled"]
   }
 }
