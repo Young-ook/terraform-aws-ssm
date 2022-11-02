@@ -32,10 +32,18 @@ parameters:
 mainSteps:
 - action: aws:configureDocker
   name: ConfigureDocker
+  precondition:
+    StringEquals:
+      - platformType
+      - Linux
   inputs:
     action: Install
 - action: aws:runShellScript
   name: InstallEnvoy
+  precondition:
+    StringEquals:
+      - platformType
+      - Linux
   inputs:
     runCommand:
       - |
@@ -57,6 +65,10 @@ mainSteps:
             840364872350.dkr.ecr.$REGION.amazonaws.com/aws-appmesh-envoy:$ENVOY_VER-prod
 - action: aws:runShellScript
   name: EnableRouting
+  precondition:
+    StringEquals:
+      - platformType
+      - Linux
   inputs:
     runCommand:
       - |
