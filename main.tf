@@ -82,7 +82,7 @@ data "cloudinit_config" "ng" {
     content_type = "text/x-shellscript"
     content      = <<-EOT
     #!/bin/bash
-    sudo yum update -y
+    yum update -y
     yum install -y amazon-cloudwatch-agent
     /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s
     EOT
