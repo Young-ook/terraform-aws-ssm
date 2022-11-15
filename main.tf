@@ -50,6 +50,7 @@ resource "aws_iam_role_policy_attachment" "ng" {
 
 resource "aws_iam_instance_profile" "ng" {
   for_each = { for ng in var.node_groups : ng.name => ng }
+  name     = aws_iam_role.ng[each.key].name
   role     = aws_iam_role.ng[each.key].id
 }
 
