@@ -49,7 +49,7 @@ module "ec2" {
   subnets = values(module.vpc.subnets["public"])
   node_groups = [
     {
-      name          = "x86"
+      name          = "bastion"
       desired_size  = 1
       instance_type = "t3.medium"
       ami_type      = "AL2_x86_64"
