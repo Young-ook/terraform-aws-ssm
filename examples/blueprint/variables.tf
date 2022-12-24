@@ -4,7 +4,19 @@
 variable "aws_region" {
   description = "The aws region to deploy"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-northeast-2"
+}
+
+variable "use_default_vpc" {
+  description = "A feature flag for whether to use default vpc"
+  type        = bool
+  default     = true
+}
+
+variable "azs" {
+  description = "A list of availability zones for the vpc to deploy resources"
+  type        = list(string)
+  default     = ["ap-northeast-2a", "ap-northeast-2c", "ap-northeast-2d"]
 }
 
 ### compute
@@ -17,7 +29,7 @@ variable "node_groups" {
 variable "name" {
   description = "The logical name of the module instance"
   type        = string
-  default     = "ssm"
+  default     = null
 }
 
 ### tags
