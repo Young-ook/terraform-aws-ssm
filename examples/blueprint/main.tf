@@ -14,7 +14,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-### vpc
+### network/vpc
 module "vpc" {
   source  = "Young-ook/vpc/aws"
   version = "1.0.3"
@@ -23,7 +23,7 @@ module "vpc" {
   vpc_config = var.use_default_vpc ? null : {
     azs         = var.azs
     cidr        = "10.10.0.0/16"
-    subnet_type = "isolated"
+    subnet_type = "public"
     single_ngw  = true
   }
   vpce_config = [
@@ -38,10 +38,19 @@ module "vpc" {
       private_dns_enabled = true
     },
   ]
-
 }
 
-# ec2
+### network/eip
+resource "aws_eip" "eip" {
+  vpc  = true
+  tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+### compute
 module "ec2" {
   source  = "Young-ook/ssm/aws"
   version = "1.0.5"
@@ -56,6 +65,16 @@ module "ec2" {
       policy_arns = [
         "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
       ]
+    },
+    {
+      name          = "eip"
+      desired_size  = 1
+      min_size      = 1
+      max_size      = 1
+      instance_type = "t3.small"
+      tags          = merge({ eipAllocId = aws_eip.eip.id })
+      user_data     = file("${path.module}/templates/eip.tpl")
+      policy_arns   = [aws_iam_policy.eip.arn]
     },
     {
       name          = "spot"
@@ -83,7 +102,7 @@ module "ec2" {
       min_size      = 0
       max_size      = 3
       instance_type = "t3.small"
-      user_data     = templatefile("${path.module}/templates/userdata.tpl", { lc_name = "warmpools-lifecycle-hook-action" })
+      user_data     = templatefile("${path.module}/templates/httpd.tpl", { lc_name = "warmpools-lifecycle-hook-action" })
       policy_arns   = [aws_iam_policy.lc.arn]
       warm_pool = {
         max_group_prepared_capacity = 2
@@ -127,4 +146,21 @@ resource "local_file" "elapsedtime" {
   })
   filename        = "${path.module}/elapsedtime.sh"
   file_permission = "0500"
+}
+
+### security/policy
+resource "aws_iam_policy" "eip" {
+  name = "eip-auto-reassociation-policy"
+  tags = var.tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "ec2:DescribeTags",
+        "ec2:AssociateAddress",
+      ]
+      Effect   = "Allow"
+      Resource = ["*"]
+    }, ]
+  })
 }
