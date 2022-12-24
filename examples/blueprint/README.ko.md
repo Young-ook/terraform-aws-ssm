@@ -61,7 +61,7 @@ Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
 
 ### 웜풀로부터 새 인스턴스 실행
-[main.tf](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint/main.tf) 파일을 열어서 `warm_pools`의 `desired_capacity` 값을 1로 변경합니다. 저장한 다음 다시 테라폼을 실행해서 변경 내용을 반영합니다.
+[main.tf](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint/main.tf) 파일을 열어서 *node_groups* 중 *warmpools*의 *desired_capacity* 값을 1로 변경합니다. 저장한 다음 다시 테라폼을 실행해서 변경 내용을 반영합니다.
 ```
 terraform apply
 ```

@@ -61,7 +61,7 @@ Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
 
 ### Launch a new instance from warm pool
-Modify the `desired_capacity` value of `warm_pools` map in [main.tf](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint/main.tf) file to 1 to scale out the current autoscaling group. After terraform configuration file update, run again terraform apply.
+Modify the *desired_capacity* value of *warmpools* in *node_groups* in [main.tf](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint/main.tf) file to 1 to scale out the current autoscaling group. After terraform configuration file update, run again terraform apply.
 ```
 terraform apply
 ```
