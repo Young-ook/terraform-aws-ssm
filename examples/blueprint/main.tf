@@ -40,6 +40,9 @@ module "ec2" {
       desired_size  = 1
       instance_type = "t3.medium"
       ami_type      = "AL2_x86_64"
+      policy_arns = [
+        "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+      ]
     },
     {
       name          = "spot"
