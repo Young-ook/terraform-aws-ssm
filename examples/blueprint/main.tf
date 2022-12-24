@@ -23,9 +23,22 @@ module "vpc" {
   vpc_config = var.use_default_vpc ? null : {
     azs         = var.azs
     cidr        = "10.10.0.0/16"
-    subnet_type = "private"
+    subnet_type = "isolated"
     single_ngw  = true
   }
+  vpce_config = [
+    {
+      service             = "ssmmessages"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "ssm"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+  ]
+
 }
 
 # ec2
@@ -36,7 +49,7 @@ module "ec2" {
   subnets = values(module.vpc.subnets["public"])
   node_groups = [
     {
-      name          = "x86"
+      name          = "bastion"
       desired_size  = 1
       instance_type = "t3.medium"
       ami_type      = "AL2_x86_64"
