@@ -3,7 +3,6 @@
 
 ## Examples
 - [EC2 Blueprint](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint)
-- [Bastion host using EIP for allowlist firewall](https://github.com/Young-ook/terraform-aws-ssm/blob/main/examples/eip)
 - [AWS Fault Injection Simulator with AWS Systems Manager](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/ec2)
 - [AWS Fault Injection Simulator with Amazon Elastic Kubernetes Service](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/eks)
 - [AWS Fault Injection Simulator with Amazon ElastiCach for Redis](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/redis)
