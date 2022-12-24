@@ -20,7 +20,7 @@ module "vpc" {
   version = "1.0.3"
   name    = var.name
   tags    = var.tags
-  vpc_config = {
+  vpc_config = var.use_default_vpc ? null : {
     azs         = var.azs
     cidr        = "10.10.0.0/16"
     subnet_type = "private"
