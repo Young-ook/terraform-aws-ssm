@@ -23,9 +23,22 @@ module "vpc" {
   vpc_config = var.use_default_vpc ? null : {
     azs         = var.azs
     cidr        = "10.10.0.0/16"
-    subnet_type = "private"
+    subnet_type = "isolated"
     single_ngw  = true
   }
+  vpce_config = [
+    {
+      service             = "ssmmessages"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+    {
+      service             = "ssm"
+      type                = "Interface"
+      private_dns_enabled = true
+    },
+  ]
+
 }
 
 # ec2
