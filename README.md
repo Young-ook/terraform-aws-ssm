@@ -3,10 +3,8 @@
 
 ## Examples
 - [EC2 Blueprint](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/blueprint)
-- [AWS Fault Injection Simulator with AWS Systems Manager](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/ec2)
-- [AWS Fault Injection Simulator with Amazon Elastic Kubernetes Service](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/eks)
-- [AWS Fault Injection Simulator with Amazon ElastiCach for Redis](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/redis)
-- [AWS Fault Injection Simulator with Amazon Relational Database Service](https://github.com/Young-ook/terraform-aws-fis/blob/main/examples/rds)
+- [AWS Systems Manager](https://github.com/Young-ook/terraform-aws-ssm/tree/main/examples/ssm-document)
+- [Chaos Engineering with AWS Fault Injection Simulator](https://github.com/Young-ook/terraform-aws-fis)
 
 ## Getting started
 ### AWS CLI
