@@ -73,7 +73,7 @@ module "ec2" {
       max_size      = 1
       instance_type = "t3.small"
       tags          = merge({ eipAllocId = aws_eip.eip.id })
-      user_data     = file("${path.module}/templates/eip.tpl")
+      user_data     = file("${path.module}/apps/eip/eip.tpl")
       policy_arns   = [aws_iam_policy.eip.arn]
     },
     {
@@ -102,7 +102,7 @@ module "ec2" {
       min_size      = 0
       max_size      = 3
       instance_type = "t3.small"
-      user_data     = templatefile("${path.module}/templates/httpd.tpl", { lc_name = "warmpools-lifecycle-hook-action" })
+      user_data     = templatefile("${path.module}/apps/warmpools/httpd.tpl", { lc_name = "warmpools-lifecycle-hook-action" })
       policy_arns   = [aws_iam_policy.lc.arn]
       warm_pool = {
         max_group_prepared_capacity = 2
@@ -140,7 +140,7 @@ resource "aws_autoscaling_lifecycle_hook" "lc" {
 }
 
 resource "local_file" "elapsedtime" {
-  content = templatefile("${path.module}/templates/elapsedtime.tpl", {
+  content = templatefile("${path.module}/apps/warmpools/elapsedtime.tpl", {
     asg_name = module.ec2.cluster.data_plane.node_groups.warmpools.name
     region   = var.aws_region
   })
