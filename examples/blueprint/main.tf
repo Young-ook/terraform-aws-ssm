@@ -73,7 +73,7 @@ module "ec2" {
       max_size      = 1
       instance_type = "t3.small"
       tags          = merge({ eipAllocId = aws_eip.eip.id })
-      user_data     = file("${path.module}/templates/eip.tpl")
+      user_data     = file("${path.module}/apps/eip/eip.tpl")
       policy_arns   = [aws_iam_policy.eip.arn]
     },
     {
