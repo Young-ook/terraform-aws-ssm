@@ -45,6 +45,3 @@ Launching a new EC2 instance into warm pool: i-0180961b460339ed3 Duration: 215s
 ```
 
 ![aws-asg-activity-history](../../../images/aws-asg-activity-history.png)
-
-### 연결
-예제에서 사용한 EC2 인스턴스는 시스템 매니저를 사용해서 접속할 수 있습니다. AWS 관리 콘솔화면에서 EC2 서비스 페이지로 이동합니다. 인스턴스를 선택하고 '연결' 또는 'Connect' 단추를 누릅니다. 그러면, EC2를 접속할 수 있는 여러 방법이 표시되는데, 그 중 세션 매니저(Session Manager)를 선택합니다. 이 후 안내를 따라 인스턴스 내부에 접속합니다.

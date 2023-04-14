@@ -50,6 +50,34 @@ resource "aws_eip" "eip" {
   }
 }
 
+### security/policy
+resource "aws_iam_policy" "eip" {
+  name = "eip-auto-reassociation-policy"
+  tags = var.tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "ec2:DescribeTags",
+        "ec2:AssociateAddress",
+      ]
+      Effect   = "Allow"
+      Resource = ["*"]
+    }, ]
+  })
+}
+
+### application/script
+locals {
+  httpd = join("\n", [
+    "sudo yum update -y",
+    "sudo yum install -y httpd",
+    "sudo rm /etc/httpd/conf.d/welcome.conf",
+    "sudo systemctl start httpd",
+    ]
+  )
+}
+
 ### compute
 module "ec2" {
   source  = "Young-ook/ssm/aws"
@@ -59,7 +87,10 @@ module "ec2" {
   node_groups = [
     {
       name          = "bastion"
+      tags          = merge(var.tags, { env = "dev" })
       desired_size  = 1
+      min_size      = 1
+      max_size      = 1
       instance_type = "t3.medium"
       ami_type      = "AL2_x86_64"
       policy_arns = [
@@ -68,11 +99,11 @@ module "ec2" {
     },
     {
       name          = "eip"
+      tags          = merge({ eipAllocId = aws_eip.eip.id })
       desired_size  = 1
       min_size      = 1
       max_size      = 1
       instance_type = "t3.small"
-      tags          = merge({ eipAllocId = aws_eip.eip.id })
       user_data     = file("${path.module}/apps/eip/eip.tpl")
       policy_arns   = [aws_iam_policy.eip.arn]
     },
@@ -108,11 +139,23 @@ module "ec2" {
         max_group_prepared_capacity = 2
         pool_state                  = "Stopped"
       }
-    }
+    },
+    {
+      name          = "envoy"
+      tags          = merge(var.tags, { envoy = "enabled" })
+      desired_size  = 1
+      instance_type = "t3.small"
+      ami_type      = "AL2_x86_64"
+      user_data     = local.httpd
+      policy_arns = [
+        "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      ]
+    },
   ]
 }
 
-# lifecycle hook complete signal policy
+### lifecycle hook complete signal policy
 resource "aws_iam_policy" "lc" {
   name = "warmpools-lifecycle-hook-action"
   tags = var.tags
@@ -148,19 +191,73 @@ resource "local_file" "elapsedtime" {
   file_permission = "0500"
 }
 
-### security/policy
-resource "aws_iam_policy" "eip" {
-  name = "eip-auto-reassociation-policy"
-  tags = var.tags
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = [
-        "ec2:DescribeTags",
-        "ec2:AssociateAddress",
-      ]
-      Effect   = "Allow"
-      Resource = ["*"]
-    }, ]
-  })
+### governence/automation
+resource "aws_ssm_document" "diskfull" {
+  name            = "Run-Disk-Stress"
+  document_format = "YAML"
+  document_type   = "Command"
+  content         = file("${path.module}/apps/documents/diskfull.yaml")
+}
+
+resource "aws_ssm_document" "cwagent" {
+  name            = "Install-CloudWatch-Agent"
+  document_format = "YAML"
+  document_type   = "Command"
+  content         = file("${path.module}/apps/documents/cwagent.yaml")
+}
+
+resource "aws_ssm_document" "envoy" {
+  name            = "Install-EnvoyProxy"
+  document_format = "YAML"
+  document_type   = "Command"
+  content         = file("${path.module}/apps/documents/envoy.yaml")
+}
+
+resource "aws_ssm_association" "cwagent" {
+  for_each         = toset(lookup(var.automation, "cwagent", false) ? ["enabled"] : [])
+  name             = aws_ssm_document.cwagent.name
+  association_name = "Install-CloudWatchAgent"
+  targets {
+    key    = "tag:env"
+    values = ["dev"]
+  }
+}
+
+resource "time_sleep" "wait" {
+  depends_on      = [aws_ssm_association.cwagent]
+  create_duration = "15s"
+}
+
+resource "aws_ssm_association" "diskfull" {
+  for_each         = toset(lookup(var.automation, "diskfull", false) ? ["enabled"] : [])
+  depends_on       = [time_sleep.wait]
+  name             = aws_ssm_document.diskfull.name
+  association_name = "Run-Disk-Stress-Test"
+  parameters = {
+    DurationSeconds = "60"
+    Workers         = "4"
+    Percent         = "70"
+  }
+  targets {
+    key    = "tag:env"
+    values = ["dev"]
+  }
+}
+
+resource "aws_ssm_association" "envoy" {
+  for_each         = toset(lookup(var.automation, "envoy", false) ? ["enabled"] : [])
+  depends_on       = [time_sleep.wait]
+  name             = aws_ssm_document.envoy.name
+  association_name = "Install-EnvoyProxy"
+  parameters = {
+    region       = var.aws_region
+    mesh         = "app"
+    vnode        = "service"
+    envoyVersion = "v1.23.1.0"
+    appPort      = "80"
+  }
+  targets {
+    key    = "tag:envoy"
+    values = ["enabled"]
+  }
 }

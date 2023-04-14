@@ -25,6 +25,17 @@ variable "node_groups" {
   default     = []
 }
 
+### features
+variable "automation" {
+  description = "Feature toggles for ec2 management automation"
+  type        = map(bool)
+  default = {
+    diskfull = false
+    cwagent  = true
+    envoy    = true
+  }
+}
+
 ### description
 variable "name" {
   description = "The logical name of the module instance"
