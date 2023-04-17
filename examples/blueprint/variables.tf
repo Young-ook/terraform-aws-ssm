@@ -26,8 +26,8 @@ variable "node_groups" {
 }
 
 ### features
-variable "automation" {
-  description = "Feature toggles for ec2 management automation"
+variable "toggles" {
+  description = "Feature toggles for ec2 management"
   type        = map(bool)
   default = {
     diskfull = false
