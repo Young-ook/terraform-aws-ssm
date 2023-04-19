@@ -214,7 +214,7 @@ resource "aws_ssm_document" "envoy" {
 }
 
 resource "aws_ssm_association" "cwagent" {
-  for_each         = toset(lookup(var.automation, "cwagent", false) ? ["enabled"] : [])
+  for_each         = toset(lookup(var.toggles, "cwagent", false) ? ["enabled"] : [])
   name             = aws_ssm_document.cwagent.name
   association_name = "Install-CloudWatchAgent"
   targets {
@@ -229,7 +229,7 @@ resource "time_sleep" "wait" {
 }
 
 resource "aws_ssm_association" "diskfull" {
-  for_each         = toset(lookup(var.automation, "diskfull", false) ? ["enabled"] : [])
+  for_each         = toset(lookup(var.toggles, "diskfull", false) ? ["enabled"] : [])
   depends_on       = [time_sleep.wait]
   name             = aws_ssm_document.diskfull.name
   association_name = "Run-Disk-Stress-Test"
@@ -245,7 +245,7 @@ resource "aws_ssm_association" "diskfull" {
 }
 
 resource "aws_ssm_association" "envoy" {
-  for_each         = toset(lookup(var.automation, "envoy", false) ? ["enabled"] : [])
+  for_each         = toset(lookup(var.toggles, "envoy", false) ? ["enabled"] : [])
   depends_on       = [time_sleep.wait]
   name             = aws_ssm_document.envoy.name
   association_name = "Install-EnvoyProxy"
