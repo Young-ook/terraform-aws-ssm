@@ -10,6 +10,5 @@ locals {
   name = module.frigga.name
   default-tags = merge(
     { "terraform.io" = "managed" },
-    { "Name" = local.name },
   )
 }
