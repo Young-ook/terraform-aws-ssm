@@ -7,4 +7,22 @@
 ### Prerequisites
 This module requires *terraform*. If you don't have the terraform tool in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-ssm) of this repository and follow the installation instructions.
 
+### Quickstart
+```
+module "vpc" {
+  source  = "Young-ook/vpc/aws"
+}
+
+module "cloud9" {
+  source  = "Young-ook/ssm/aws//modules/cloud9"
+  subnet = values(module.vpc.subnets["public"])[0]
+}
+```
+
+Run terraform:
+```
+terraform init
+terraform apply
+```
+
 # Additional Resources
