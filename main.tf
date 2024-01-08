@@ -1,9 +1,5 @@
 ## ec2 autoscaling groups with systems manager/session manager
 
-module "aws" {
-  source = "Young-ook/spinnaker/aws//modules/aws-partitions"
-}
-
 ## features
 locals {
   node_groups_enabled = (var.node_groups != null ? ((length(var.node_groups) > 0) ? true : false) : false)
@@ -101,8 +97,8 @@ resource "aws_launch_template" "ng" {
   tags          = merge(local.default-tags, var.tags, lookup(each.value, "tags", {}))
   image_id      = lookup(each.value, "image_id", data.aws_ami.al2[each.key].id)
   user_data     = data.cloudinit_config.ng[each.key].rendered
-  instance_type = lookup(each.value, "instance_type", "t3.medium")
-  key_name      = lookup(each.value, "key_name", null)
+  instance_type = lookup(each.value, "instance_type", local.default_ec2["instance_type"])
+  key_name      = lookup(each.value, "key_name", local.default_ec2["keypair"])
 
   iam_instance_profile {
     arn = aws_iam_instance_profile.ng[each.key].arn
@@ -111,14 +107,14 @@ resource "aws_launch_template" "ng" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size           = lookup(each.value, "disk_size", "20")
-      volume_type           = lookup(each.value, "volume_type", "gp2")
+      volume_size           = lookup(each.value, "disk_size", local.default_ec2["volume_size"])
+      volume_type           = lookup(each.value, "volume_type", local.default_ec2["volume_type"])
       delete_on_termination = true
     }
   }
 
   network_interfaces {
-    security_groups       = lookup(each.value, "security_groups", [])
+    security_groups       = lookup(each.value, "security_groups", local.default_ec2["security_groups"])
     delete_on_termination = true
   }
 
@@ -136,10 +132,10 @@ resource "aws_autoscaling_group" "ng" {
   for_each              = { for ng in var.node_groups : ng.name => ng }
   name                  = join("-", [local.name, each.key])
   vpc_zone_identifier   = var.subnets
-  max_size              = lookup(each.value, "max_size", 3)
-  min_size              = lookup(each.value, "min_size", 1)
-  desired_capacity      = lookup(each.value, "desired_size", 1)
-  target_group_arns     = lookup(each.value, "target_group_arns", null)
+  max_size              = lookup(each.value, "max_size", local.default_asg["max_size"])
+  min_size              = lookup(each.value, "min_size", local.default_asg["min_size"])
+  desired_capacity      = lookup(each.value, "desired_size", local.default_asg["desired_size"])
+  target_group_arns     = lookup(each.value, "target_group_arns", local.default_asg["target_group_arns"])
   force_delete          = true
   protect_from_scale_in = false
   termination_policies  = ["Default"]
