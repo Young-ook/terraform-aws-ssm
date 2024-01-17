@@ -1,9 +1,10 @@
 [[English](README.md)] [[한국어](README.ko.md)]
 
-# EC2 Bluprint
-This is EC2 Blueprint example helps you compose complete EC2 clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. With this EC2 Blueprint example, you describe the configuration for the desired state of your EC2 environment, such as the control plane, worker nodes, and applications, as an Infrastructure as Code (IaC) template/blueprint. Once a blueprint is configured, you can use it to stamp out consistent environments across multiple AWS accounts and Regions using your automation workflow tool, such as Jenkins, CodePipeline. Also, you can use EC2 Blueprint to easily bootstrap an EC2 cluster with user-data for initial configuration whatever you want on your instance. EC2 Blueprints also helps you implement relevant security controls needed to operate workloads from multiple teams in the same cluster.
+# EC2 블루프린트(Blueprint)
+EC2 블루프린트 예제는 EC2 워크로드를 배포하고 운영하기 위해 필요한 소프트웨어를 자동으로 설정하는 과정을 돕는 예제입니다. EC2 블루프린트를 활용하면, 여러 분이 원하는 설정의 EC2 실행환경을 인프라스트럭처 코드(Infrastructure as Code, IaC)의 템플릿/청사진 형태로 만들 수 있습니다. 한 번 블루프린트를 설정했다면, 여러 분은 젠킨스(Jenkins) 또는 코드파이프라인(CodePipeline)과 같은 자동화 도구를 활용하여 필요에 따라 여러 AWS 계정 또는 리전에 같은 환경을 찍어낼 수 있습니다. 또한 여러 분은 EC2 블루프린트를 활용하여 EC2 user-data에 원하는 초기 설정을 등록하여 실행할 수 있습니다. 그리고 EC2 블루프린트는 여러 분이 동일한 클러스터를 여러 팀에게 제공해야 하는 워크로드를 운영해야 할 때 필요한 보안관련 사항들을 쉽게 구축하는 것을 도와줍니다.
 
-## 필수 준비사항
+## 설치
+### 필수요소
 이 모듈에서 사용하는 스크립트에서는 웜풀의 변경사항을 조회해서 보여주는 기능을 제공합니다. 이 스크립트 내부에서는 `DescribeScalingActivities` API 응답 JSON 값을 분석하고, 기록된 시간 정보들로부터 작업 시간을 측정하기 위하여 몇 가지 도구를 사용합니다. [jq](https://stedolan.github.io/jq/download/)와 [dateutils](http://www.fresse.org/dateutils/)을 설치합니다.
 
 **macOS**
@@ -11,32 +12,34 @@ This is EC2 Blueprint example helps you compose complete EC2 clusters that are f
 brew install jq dateutils
 ```
 
-## Setup
-### Download
-Download this example on your workspace
+### 내려받기
+여러 분의 작업 환경에 예제를 내려받기 합니다.
 ```
 git clone https://github.com/Young-ook/terraform-aws-ssm
 cd terraform-aws-ssm/examples/blueprint
 ```
 
-Then you are in **blueprint** directory under your current workspace. There is an exmaple that shows how to use terraform configurations to create and manage an EC2 cluster and utilities on your AWS account. Check out and apply it using terraform command. If you don't have the terraform and kubernetes tools in your environment, go to the main [page](https://github.com/Young-ook/terraform-aws-ssm) of this repository and follow the installation instructions before you move to the next step.
+작업이 끝나면 **blueprint** 디렉토리를 볼 수 있습니다. 디렉토리 안에 있는 예제에는 EC2 클러스터와 추가 요소를 설치하고 관리하기 위한 테라폼(terraform) 설정 파일과 기타 자원이 있습니다. 다음 단계로 넘어가기 전에 테라폼이 제대로 설치 되어 있는 지 확인합니다. 만약, 테라폼이 여러 분의 환경에 없다면, 다음 단계로 이동하기 전에 메인 [페이지](https://github.com/Young-ook/terraform-aws-ssm)의 안내에 따라 설치하시기 바랍니다.
 
-Run terraform:
+테라폼을 실행합니다:
 ```
 terraform init
 terraform apply
 ```
-Also you can use the *-var-file* option for customized paramters when you run the terraform plan/apply command.
+또는, *-var-file* 옵션을 활용하여 원하는 파라메터를 전달할 수 있습니다.
 ```
 terraform plan -var-file fixture.tc1.tfvars
 terraform apply -var-file fixture.tc1.tfvars
 ```
 
 ## 컴퓨팅 옵션
-### AWS 그래비톤
-[AWS 그래비톤](https://aws.amazon.com/ec2/graviton/) 프로세서는 are custom built by Amazon Web Services using 64-bit ARM Neoverse cores to deliver the best price performance for you cloud workloads running on Amazon EC2. The new general purpose (M6g), compute-optimized (C6g), and memory-optimized (R6g) instances deliver up to 40% better price/performance over comparable current generation x86-based instances for scale-out and Arm-based applications such as web servers, containerized microservices, caching fleets, and distributed data stores that are supported by the extensive Arm ecosystem. You can mix x86 and Arm based EC2 instances within a cluster, and easily evaluate Arm-based application in existing environments. Here is a useful [getting started](https://github.com/aws/aws-graviton-getting-started) guide on how to start to use AWS Graviton. This github repository would be good point where to start. You can find out more details about how to build, run and optimize your application for AWS Graviton processors.
+### AWS 그래비톤 (Graviton)
+[AWS 그래비톤 (Graviton)](https://aws.amazon.com/ec2/graviton/) 프로세서는 Amazon EC2에서 실행되는 클라우드 워크로드를 최고의 가격 대비 성능을 제공하기 위해 64비트 ARM Neoverse 코어를 사용하여 Amazon Web Services에서 맞춤 제작한 했습니다. 새로운 범용(M6g), 컴퓨팅 최적화(C6g), 메모리 최적화(R6g) 인스턴스는 웹 서버, 컨테이너형 마이크로서비스, 캐싱 플릿, 분산 데이터 스토어와 같은 스케일아웃 및 Arm 기반 애플리케이션을 위해 동급의 현세대 x86 기반 인스턴스 대비 최대 40% 향상된 가격 대비 성능을 제공하며, 광범위한 Arm 에코시스템에서 지원됩니다. 클러스터 내에서 x86 및 Arm 기반 EC2 인스턴스를 혼합할 수 있으며, 기존 환경에서 Arm 기반 애플리케이션을 쉽게 평가할 수 있습니다. 다음은 AWS Graviton 사용을 시작하는 방법에 대한 유용한 [시작하기](https://github.com/aws/aws-graviton-getting-started) 가이드입니다. AWS Graviton 프로세서를 위한 애플리케이션 빌드, 실행 및 최적화 방법에 대한 자세한 내용을 GitHub 저장소의 가이드에서 확인할 수 있습니다.
 
-## Applications
+![aws-graviton2-perf](../../images/aws-graviton2-perf.png)
+*source*: [AnandTech](https://www.anandtech.com/show/15578/cloud-clash-amazon-graviton2-arm-against-intel-and-amd)
+
+## 애플리케이션
 - [웜풀](./apps/README.ko.md#EC2-오토스케일링-그룹-웜풀)
 
 ## 정리
@@ -45,12 +48,12 @@ terraform apply -var-file fixture.tc1.tfvars
 terraform destroy
 ```
 
-If you don't want to see a confirmation question, you can use quite option for terraform destroy command
+삭제 명령을 수행하기 전에 재차 확인하는 과정이 있는데, 이 부분을 바로 넘기려면 테라폼 옵션을 활용할 수 있습니다.
 ```
 terraform destroy --auto-approve
 ```
 
-만약 *-var-file* 옵션을 사용해서 자원을 생성했다면, 삭제할 때도 같은 변수를 **반드시** 사용해야 합니다. 꼭 잊지말고 생성할 때 사용한 변수를 지정해서 자원을 삭제합니다.
+**[주의]** 여러 분이 자원을 생성할 때 *-var-file*을 사용했다면, 삭제 할 때에도 반드시 같은 변수 파일을 옵션으로 지정해야 합니다.
 ```
 terraform destroy -var-file fixture.tc1.tfvars
 ```
