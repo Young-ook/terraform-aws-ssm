@@ -3,7 +3,8 @@
 # EC2 Bluprint
 This is EC2 Blueprint example helps you compose complete AWS Systems Manager managed EC2 clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads. With this EC2 Blueprint example, you describe the configuration for the desired state of your EC2 environment, such as the control plane, worker nodes, and applications, as an Infrastructure as Code (IaC) template/blueprint. Once a blueprint is configured, you can use it to stamp out consistent environments across multiple AWS accounts and Regions using your automation workflow tool, such as Jenkins, CodePipeline. Also, you can use EC2 Blueprint to easily bootstrap an EC2 cluster with user-data for initial configuration whatever you want on your instance. EC2 Blueprints also helps you implement relevant security controls needed to operate workloads from multiple teams in the same cluster.
 
-## Prerequiesites
+## Setup
+### Prerequiesites
 This example creates a script to display warm pools activities. This script uses a couple open source tools to parse the JSON response from a `DescribeScalingActivities` API call. Ensure you have [jq](https://stedolan.github.io/jq/download/) and [dateutils](http://www.fresse.org/dateutils/) installed in your environment.
 
 **macOS**
@@ -11,7 +12,6 @@ This example creates a script to display warm pools activities. This script uses
 brew install jq dateutils
 ```
 
-## Setup
 ### Download
 Download this example on your workspace
 ```
