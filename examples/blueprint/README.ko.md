@@ -57,3 +57,7 @@ terraform destroy --auto-approve
 ```
 terraform destroy -var-file fixture.tc1.tfvars
 ```
+
+# 추가 정보
+## AWS Graviton
+- [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)

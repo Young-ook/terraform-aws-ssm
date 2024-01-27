@@ -59,3 +59,5 @@ terraform destroy -var-file fixture.tc1.tfvars
 ```
 
 # Additional Resources
+## AWS Graviton
+- [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)
