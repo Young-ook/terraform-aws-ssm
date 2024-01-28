@@ -61,3 +61,6 @@ terraform destroy -var-file fixture.tc1.tfvars
 # 추가 정보
 ## AWS Graviton
 - [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)
+
+## AWS for Games
+- [The Unique Architecture behind Amazon Games’ Seamless MMO New World](https://aws.amazon.com/blogs/gametech/the-unique-architecture-behind-amazon-games-seamless-mmo-new-world/)
