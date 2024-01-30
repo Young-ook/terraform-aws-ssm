@@ -59,3 +59,15 @@ terraform destroy -var-file fixture.tc1.tfvars
 ```
 
 # Additional Resources
+## Amazon EC2 AutoScaling Warm Pools
+- [Scaling your applications faster with EC2 Auto Scaling Warm Pools](https://aws.amazon.com/blogs/compute/scaling-your-applications-faster-with-ec2-auto-scaling-warm-pools/)
+
+## AWS Graviton
+- [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)
+- [Reduce costs and improve sustainability with AWS Graviton](https://catalog.workshops.aws/graviton/en-US)
+
+## AWS for Games
+- [The Unique Architecture behind Amazon Games’ Seamless MMO New World](https://aws.amazon.com/blogs/gametech/the-unique-architecture-behind-amazon-games-seamless-mmo-new-world/)
+
+## AWS Lambda hook for Amazon EC2 Autoscaling
+- [Using Auto Scaling lifecycle hooks, Lambda, and EC2 Run Command](https://github.com/aws-samples/aws-lambda-lifecycle-hooks-function)
