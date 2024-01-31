@@ -63,6 +63,9 @@ terraform destroy -var-file fixture.tc1.tfvars
 - [Scaling your applications faster with EC2 Auto Scaling Warm Pools](https://aws.amazon.com/blogs/compute/scaling-your-applications-faster-with-ec2-auto-scaling-warm-pools/)
 - [Using Auto Scaling lifecycle hooks, Lambda, and EC2 Run Command](https://github.com/aws-samples/aws-lambda-lifecycle-hooks-function)
 - [Amazon EC2 Image Builder Samples](https://github.com/aws-samples/amazon-ec2-image-builder-samples)
+- [New – Attribute-Based Instance Type Selection for EC2 Auto Scaling and EC2 Fleet](https://aws.amazon.com/blogs/aws/new-attribute-based-instance-type-selection-for-ec2-auto-scaling-and-ec2-fleet/)
+- [Migrate your Amazon EBS volumes from gp2 to gp3 and save up to 20% on costs](https://aws.amazon.com/blogs/storage/migrate-your-amazon-ebs-volumes-from-gp2-to-gp3-and-save-up-to-20-on-costs/)
+- [How to Automate Cost and Performance Improvement Through gp3 Upgrades Using AWS Systems Manager](https://aws.amazon.com/blogs/apn/how-to-automate-cost-and-performance-improvement-through-gp3-upgrades-using-aws-systems-manager/)
 
 ## AWS Graviton
 - [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)

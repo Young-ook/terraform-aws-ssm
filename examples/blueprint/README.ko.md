@@ -63,6 +63,9 @@ terraform destroy -var-file fixture.tc1.tfvars
 - [EC2 오토스케일링 웜풀을 활용하여 보다 빠르게 애플리케이션 확대/축소 하기](https://aws.amazon.com/blogs/compute/scaling-your-applications-faster-with-ec2-auto-scaling-warm-pools/)
 - [오토스케일링 수명주기와 Lambda, EC2 Run Command 함께 활용하기](https://github.com/aws-samples/aws-lambda-lifecycle-hooks-function)
 - [Amazon EC2 이미지 생성 자동화 예제](https://github.com/aws-samples/amazon-ec2-image-builder-samples)
+- [신규 – EC2 오토스케일링과 EC2 플릿을 위한 속성 기반 인스턴스 타입 선택 기능](https://aws.amazon.com/blogs/aws/new-attribute-based-instance-type-selection-for-ec2-auto-scaling-and-ec2-fleet/)
+- [Amazon EBS volumes을 gp2에서 gp3로 변경하여 최대 20% 비용 절감하기](https://aws.amazon.com/blogs/storage/migrate-your-amazon-ebs-volumes-from-gp2-to-gp3-and-save-up-to-20-on-costs/)
+- [AWS Systems Manager를 활용하여 비용과 성능 개선을 위한 gp3 전환 자동화하는 방법](https://aws.amazon.com/blogs/apn/how-to-automate-cost-and-performance-improvement-through-gp3-upgrades-using-aws-systems-manager/)
 
 ## AWS Graviton
 - [AWS Graviton 시작하기](https://github.com/aws/aws-graviton-getting-started)
