@@ -59,15 +59,18 @@ terraform destroy -var-file fixture.tc1.tfvars
 ```
 
 # 추가 정보
-## Amazon EC2 AutoScaling Warm Pools
-- [Scaling your applications faster with EC2 Auto Scaling Warm Pools](https://aws.amazon.com/blogs/compute/scaling-your-applications-faster-with-ec2-auto-scaling-warm-pools/)
+## Amazon EC2
+- [EC2 오토스케일링 웜풀을 활용하여 보다 빠르게 애플리케이션 확대/축소 하기](https://aws.amazon.com/blogs/compute/scaling-your-applications-faster-with-ec2-auto-scaling-warm-pools/)
+- [오토스케일링 수명주기와 Lambda, EC2 Run Command 함께 활용하기](https://github.com/aws-samples/aws-lambda-lifecycle-hooks-function)
+- [Amazon EC2 오토스케일링 예제](https://github.com/aws-samples/amazon-ec2-auto-scaling-group-examples)
+- [신규 – EC2 오토스케일링과 EC2 플릿을 위한 속성 기반 인스턴스 타입 선택 기능](https://aws.amazon.com/blogs/aws/new-attribute-based-instance-type-selection-for-ec2-auto-scaling-and-ec2-fleet/)
+- [Amazon EC2 이미지 생성 자동화 예제](https://github.com/aws-samples/amazon-ec2-image-builder-samples)
+- [Amazon EBS volumes을 gp2에서 gp3로 변경하여 최대 20% 비용 절감하기](https://aws.amazon.com/blogs/storage/migrate-your-amazon-ebs-volumes-from-gp2-to-gp3-and-save-up-to-20-on-costs/)
+- [AWS Systems Manager를 활용하여 비용과 성능 개선을 위한 gp3 전환 자동화하는 방법](https://aws.amazon.com/blogs/apn/how-to-automate-cost-and-performance-improvement-through-gp3-upgrades-using-aws-systems-manager/)
 
 ## AWS Graviton
-- [AWS Graviton Getting Started](https://github.com/aws/aws-graviton-getting-started)
-- [Reduce costs and improve sustainability with AWS Graviton](https://catalog.workshops.aws/graviton/en-US)
+- [AWS Graviton 시작하기](https://github.com/aws/aws-graviton-getting-started)
+- [AWS Graviton을 통한 비용 절감과 지속 가능성 증진](https://catalog.workshops.aws/graviton/en-US)
 
 ## AWS for Games
 - [The Unique Architecture behind Amazon Games’ Seamless MMO New World](https://aws.amazon.com/blogs/gametech/the-unique-architecture-behind-amazon-games-seamless-mmo-new-world/)
-
-## AWS Lambda hook for Amazon EC2 Autoscaling
-- [Using Auto Scaling lifecycle hooks, Lambda, and EC2 Run Command](https://github.com/aws-samples/aws-lambda-lifecycle-hooks-function)
